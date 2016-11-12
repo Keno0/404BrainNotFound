@@ -120,11 +120,13 @@ void TPlayer::makeMove() {
 			rentTower(maxPopTower(map->towers, map->towerMap, maxPopLocationX, maxPopLocationY), 10, 35, 100);
 			rentTower(124, 10, 35, 100);
 			break;
-		case growth:			
-			outputData.invest = inputData.header.time + 100;
+		case growth:
+			if(inputData.towerInf[124].techLevel < 5)
+				outputData.invest = playerMoneyBuffer.AvarageOfLastFiveMonth()*0.1;
 			break;
 		case stagnation:
-			outputData.invest = inputData.header.time;
+			if (inputData.towerInf[124].techLevel < 5)
+				outputData.invest = playerMoneyBuffer.AvarageOfLastFiveMonth()*0.05;
 			break;
 		case decrease:
 			leaveTower(124);
