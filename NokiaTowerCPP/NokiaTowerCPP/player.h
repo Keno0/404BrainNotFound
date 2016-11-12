@@ -8,26 +8,27 @@
 #include "decl.h"
 #include "map.h"
 
+#define SIZE_OF_MONEY_BUFFER 5
 using namespace std;
 
 class MoneyBuffer
 {
 public:
-	double moneyInLastFiveMonth[5];
+	double moneyInLastMonths[SIZE_OF_MONEY_BUFFER];
 	int lastIndex = 0;
 
 	MoneyBuffer()
 	{
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < SIZE_OF_MONEY_BUFFER; i++)
 		{
-			moneyInLastFiveMonth[i] = 0;
+			moneyInLastMonths[i] = 0;
 		}
 	}
 
 	void Add(int money)
 	{
-		moneyInLastFiveMonth[lastIndex] = money;
-		if (lastIndex >= 4)
+		moneyInLastMonths[lastIndex] = money;
+		if (lastIndex >= SIZE_OF_MONEY_BUFFER-1)
 			lastIndex = 0;
 		else
 			lastIndex++;
@@ -37,11 +38,11 @@ public:
 	{
 		double temp = 0;
 		int divisor = 0;
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < SIZE_OF_MONEY_BUFFER; i++)
 		{
-			if (moneyInLastFiveMonth[i] != 0)
+			if (moneyInLastMonths[i] != 0)
 			{
-				temp += moneyInLastFiveMonth[i];
+				temp += moneyInLastMonths[i];
 				divisor++;
 			}
 		}
