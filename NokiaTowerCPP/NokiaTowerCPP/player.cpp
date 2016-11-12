@@ -6,6 +6,55 @@ using namespace std;
 // Write your own makeMove function.
 //-------------------------------------------------------------------
 
+enum States
+{
+	initState,
+	growth,
+	stagnation,
+	decrease
+};
+
+static class profitBuffer
+{
+	int profitInLastFiveMonth[5];
+	int lastIndex = 0;
+
+	profitBuffer()
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			profitInLastFiveMonth[i] = 0;
+		}
+	}
+
+	void Add(int profit)
+	{
+		profitInLastFiveMonth[lastIndex] = profit;
+		if (lastIndex >= 4)
+			lastIndex = 0;
+		else
+			lastIndex++;
+	}
+
+	int AvarageOfLastFiveMonth()
+	{
+		int temp=0;
+		int divisor = 0;
+		for (int i = 0; i < 5; i++)
+		{
+			if (profitInLastFiveMonth[i] != 0)
+			{
+				temp += profitInLastFiveMonth[i];
+				divisor++;
+			}
+		}
+
+		if (temp == 0 || divisor == 0)
+			return 0;
+		else
+			return (int)(temp/divisor);
+	}
+};
 
 int maxPop(int pop[MAP_SIZE][MAP_SIZE], int &x, int &y)
 {
@@ -55,11 +104,18 @@ double maxPopTower(int towers[][2], bool towerMap[MAP_SIZE][MAP_SIZE], int &x, i
 	return ID;
 }
 
+States determinateCurrentState(TinputData inputData)
+{
+	States state = initState;
+	return state;
+}
+
 
 void TPlayer::makeMove() {
 
 	int maxPopLocationX = 0;
 	int maxPopLocationY = 0;
+	States state = initState;
 
     map->MapNextTime(); // next population state
 
@@ -103,6 +159,10 @@ void TPlayer::makeMove() {
 			rentTower(maxPopTower(map->towers, map->towerMap, maxPopLocationX, maxPopLocationY), 10, 35, 100);
 
 		}
+
+		state = determinateCurrentState(inputData);
+
+
 		
         //if (inputData.header.time == 140) leaveTower(124);
     }
