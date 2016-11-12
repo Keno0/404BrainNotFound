@@ -14,47 +14,6 @@ enum States
 	decrease
 };
 
-static class profitBuffer
-{
-	int profitInLastFiveMonth[5];
-	int lastIndex = 0;
-
-	profitBuffer()
-	{
-		for (int i = 0; i < 5; i++)
-		{
-			profitInLastFiveMonth[i] = 0;
-		}
-	}
-
-	void Add(int profit)
-	{
-		profitInLastFiveMonth[lastIndex] = profit;
-		if (lastIndex >= 4)
-			lastIndex = 0;
-		else
-			lastIndex++;
-	}
-
-	int AvarageOfLastFiveMonth()
-	{
-		int temp=0;
-		int divisor = 0;
-		for (int i = 0; i < 5; i++)
-		{
-			if (profitInLastFiveMonth[i] != 0)
-			{
-				temp += profitInLastFiveMonth[i];
-				divisor++;
-			}
-		}
-
-		if (temp == 0 || divisor == 0)
-			return 0;
-		else
-			return (int)(temp/divisor);
-	}
-};
 
 int maxPop(int pop[MAP_SIZE][MAP_SIZE], int &x, int &y)
 {
@@ -104,9 +63,28 @@ double maxPopTower(int towers[][2], bool towerMap[MAP_SIZE][MAP_SIZE], int &x, i
 	return ID;
 }
 
-States determinateCurrentState(TinputData inputData)
+States determinateCurrentState(TinputData inputData, MoneyBuffer moneyBuffer)
 {
 	States state = initState;
+	double economyChange = 0;
+
+	cout << "inputData.header.money: " << inputData.header.money << endl;
+	cout << "Last five month: " << moneyBuffer.AvarageOfLastFiveMonth() << endl;
+
+	if (moneyBuffer.AvarageOfLastFiveMonth() == 0)
+	{
+		return state;
+	}
+
+	economyChange = (inputData.header.money / moneyBuffer.AvarageOfLastFiveMonth()) * 100;
+	cout << "economyChange " << economyChange << endl;
+	if (economyChange > 101.5)
+		return growth;
+	if (economyChange <= 101.5 || economyChange >= 98.5)
+		return stagnation;
+	if (economyChange < 98.5)
+		return decrease;
+
 	return state;
 }
 
@@ -125,47 +103,40 @@ void TPlayer::makeMove() {
     outputData.invest = 0;
     outputData.numOrders = 0;
 
-    if (scriptName.size() > 0) {
-        outputData.invest = IScript[myTime];
-        outputData.numOrders = 0;
-        while ((OMut <= OMax) && (myTime >= Times[OMut])) {
-            if (myTime == Times[OMut]) {
-                outputData.orders[outputData.numOrders].towerID = OScript[OMut].towerID;
-                outputData.orders[outputData.numOrders].rentingCost = OScript[OMut].rentingCost;
-                outputData.orders[outputData.numOrders].distance = OScript[OMut].distance;
-                outputData.orders[outputData.numOrders].offer = OScript[OMut].offer;
-                outputData.orders[outputData.numOrders].leave = OScript[OMut].leave;
-                outputData.numOrders++;
-            }
-            OMut++;
-        }
-    }
-    else {
-        if (inputData.header.time == 1) rentTower(124, 10, 35, 100);
-        if (inputData.header.time == 5) changeDistanceAndOffer(124, 20, 110);
-        if (inputData.header.time > 10 && inputData.header.time < 120) outputData.invest = inputData.header.time;
-		if (inputData.header.time == 10) 
+	playerMoneyBuffer.Add(inputData.header.money);
+	if(inputData.header.time< 2)
+	{
+		state = initState;
+	}
+	else
+	{
+		state = determinateCurrentState(inputData, playerMoneyBuffer);
+	}
+		cout << " current state : " << state << endl;
+		switch (state)
 		{
-			cout << "time: " << inputData.header.time << " max pop:" << maxPop(map->pop,maxPopLocationX, maxPopLocationY ) << endl;
-			cout << " maxPopLocationX: " << maxPopLocationX << " maxPopLocationY: " << maxPopLocationY;
-			rentTower(maxPopTower(map->towers,map->towerMap, maxPopLocationX, maxPopLocationY), 10, 35, 100);
-
-		}
-
-		if (inputData.header.time == 20)
-		{
-			cout << "time: " << inputData.header.time << " max pop:" << maxPop(map->pop, maxPopLocationX, maxPopLocationY) << endl;
-			cout << " maxPopLocationX: " << maxPopLocationX << " maxPopLocationY: " << maxPopLocationY;
+		case initState:	
+			maxPop(map->pop, maxPopLocationX, maxPopLocationY);
 			rentTower(maxPopTower(map->towers, map->towerMap, maxPopLocationX, maxPopLocationY), 10, 35, 100);
-
+			rentTower(124, 10, 35, 100);
+			break;
+		case growth:			
+			outputData.invest = inputData.header.time + 100;
+			break;
+		case stagnation:
+			outputData.invest = inputData.header.time;
+			break;
+		case decrease:
+			leaveTower(124);
+			break;
+		default:
+			break;
 		}
-
-		state = determinateCurrentState(inputData);
 
 
 		
         //if (inputData.header.time == 140) leaveTower(124);
-    }
+    
 }
 
 
