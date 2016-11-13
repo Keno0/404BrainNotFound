@@ -8,8 +8,56 @@
 #include "decl.h"
 #include "map.h"
 
-#define SIZE_OF_MONEY_BUFFER 5
+#define SIZE_OF_MONEY_BUFFER 20
+#define PLAYER_TOWER_INDEXES 100
 using namespace std;
+
+class PlayerTowers
+{
+public:
+	int playerTowerIndexes[PLAYER_TOWER_INDEXES];
+	int actualPosition=0;
+
+	PlayerTowers()
+	{
+		for (int i = 0; i < PLAYER_TOWER_INDEXES; i++)
+			playerTowerIndexes[i] = -1;
+	}
+
+	void Add(int towerID)
+	{
+		if (actualPosition < PLAYER_TOWER_INDEXES)
+		{
+			playerTowerIndexes[actualPosition] = towerID;
+			actualPosition++;
+		}
+		else
+			actualPosition = 0;
+	}
+
+	void Remove(int towerID)
+	{
+		for (int i = 0; i <= actualPosition; i++)
+		{
+			if (playerTowerIndexes[i] == towerID)
+			{
+				playerTowerIndexes[i] = -1;
+			}
+		}
+	}
+
+	bool IsItOurTower(int towerID)
+	{
+		for (int i = 0; i <= actualPosition; i++)
+		{
+			if (playerTowerIndexes[i] == towerID)
+				return true;
+		}
+
+		return false;
+	}
+	
+};
 
 class MoneyBuffer
 {
@@ -61,6 +109,7 @@ public:
     int seed;
     int myTime;
 	MoneyBuffer playerMoneyBuffer;
+	PlayerTowers playerTowers;
 
     Map *map = nullptr;
 
@@ -112,6 +161,16 @@ public:
     }
 
     void makeMove();
+
+	void AddTowersIfItsOur()
+	{
+		for (int i = 0; i < TOWER_MAX; i++)
+		{
+			if (inputData.towerInf[i].owner == ID && inputData.towerInf[i].licit == 0)
+				if (!playerTowers.IsItOurTower(i))
+					playerTowers.Add(i);
+		}
+	}
 
 protected:
     void rentTower(short ID, float rentingCost, short dist, float offer)

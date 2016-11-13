@@ -103,15 +103,20 @@ void TPlayer::makeMove() {
     outputData.invest = 0;
     outputData.numOrders = 0;
 
-	playerMoneyBuffer.Add(inputData.header.money);
+	AddTowersIfItsOur();
+	
 	if(inputData.header.time< 2)
 	{
 		state = initState;
+		
 	}
 	else
 	{
 		state = determinateCurrentState(inputData, playerMoneyBuffer);
 	}
+
+
+	playerMoneyBuffer.Add(inputData.header.money);
 		cout << " current state : " << state << endl;
 		switch (state)
 		{
