@@ -19,7 +19,7 @@ int maxPop(int pop[MAP_SIZE][MAP_SIZE], int &x, int &y)
 {
 	int i = 0;
 	int j = 0;
-	double temp = 0;
+	int temp = 0;
 	for (i = 0; i < MAP_SIZE; i++)
 	{
 		for (j = 0; j < MAP_SIZE; j++)
@@ -40,13 +40,10 @@ double getDistance(int x, int y, int j, int k) {
 	return std::sqrt(std::pow((x - j), 2) + std::pow(y - k, 2));
 }
 
-double maxPopTower(int towers[][2], bool towerMap[MAP_SIZE][MAP_SIZE], int &x, int &y) {
+int maxPopTower(int towers[][2], bool towerMap[MAP_SIZE][MAP_SIZE], int &x, int &y) {
 
-	int temp_x, temp_y = 0, ID = 0;
+	int ID = 0;
 	double min_distance = 100000000;
-
-
-	
 
 	for(int i = 0; i < TOWER_MAX; i++)
 	{
@@ -54,8 +51,7 @@ double maxPopTower(int towers[][2], bool towerMap[MAP_SIZE][MAP_SIZE], int &x, i
 		{
 			min_distance = getDistance(x, y, towers[i][0], towers[i][1]);
 			ID = i;
-		}
-		
+		}		
 	}
 
 	cout << " min dist: " << min_distance << endl;
@@ -106,6 +102,16 @@ void TPlayer::makeMove() {
 	AddTowersIfItsOur();
 	
 	if(inputData.header.time< 2)
+        if (inputData.header.time == 1) rentTower(124, 10, 35, 100);
+		cout << "money:" << inputData.header.money << endl;
+		if (inputData.header.time == 1) {
+			rentTower(27,7.1, 3, 1);
+			rentTower(28, 8.01, 4, 1);
+			rentTower(29, 9.001, 5, 1);
+			rentTower(30, 10.0001, 6, 1);
+			
+		}
+        if (inputData.header.time > 10 && inputData.header.time < 120) outputData.invest = inputData.header.time;
 	{
 		state = initState;
 		
@@ -145,5 +151,6 @@ void TPlayer::makeMove() {
         //if (inputData.header.time == 140) leaveTower(124);
     
 }
+
 
 
