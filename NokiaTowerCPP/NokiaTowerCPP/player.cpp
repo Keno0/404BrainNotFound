@@ -114,7 +114,7 @@ void TPlayer::makeMove() {
 		case initState:	
 			tempPop = 0;
 			tempID = 0;
-			for (int i = 0; i < (MAP_SIZE / 30)*(MAP_SIZE / 30); i++)
+			for (int i = 0; i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE); i++)
 			{
 				
 				if (tempPop < magicMap.population_with_tower_id[i][0] && !playerTowers.IsItOurTower(magicMap.population_with_tower_id[i][1]))
@@ -124,12 +124,18 @@ void TPlayer::makeMove() {
 				}
 			}
 
-			rentTower(tempID, 10, 35, 100);
+			cout << "max pop: " << tempPop << endl;
+			cout << "max pop tower ID: " << tempID << endl;
+			cout << "tower X: " << map->towers[tempID][0] << endl;
+			cout << "tower Y: " << map->towers[tempID][1] << endl;
+
+			rentTower(tempID, 10, 15, 100);
+			rentTower(38, 10, 20, 100);
 			break;
 		case growth:
 			tempPop = 0;
 			tempID = 0;
-			for (int i = 0; i < (MAP_SIZE / 30)*(MAP_SIZE / 30); i++)
+			for (int i = 0; i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE); i++)
 			{
 				if (tempPop < magicMap.population_with_tower_id[i][0] && !playerTowers.IsItOurTower(magicMap.population_with_tower_id[i][1]))
 				{

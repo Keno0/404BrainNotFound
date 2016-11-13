@@ -10,6 +10,7 @@
 
 #define SIZE_OF_MONEY_BUFFER 20
 #define PLAYER_TOWER_INDEXES 100
+#define DISTRICT_SIZE 30
 using namespace std;
 
 class PlayerTowers
@@ -106,8 +107,9 @@ class MagicMap {
 public:
 	int population[MAP_SIZE][MAP_SIZE];
 	int towers[TOWER_MAX][2];
-	int magicMap[MAP_SIZE / 30][MAP_SIZE / 30];
-	int population_with_tower_id[(MAP_SIZE / 30)*(MAP_SIZE / 30)][2];
+	int magicMap[MAP_SIZE / DISTRICT_SIZE][MAP_SIZE / DISTRICT_SIZE];
+	int population_with_tower_id[(MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)][2];
+	bool debug = false;
 
 	MagicMap()
 	{
@@ -119,15 +121,15 @@ public:
 			}
 		}
 
-		for (int i = 0; i < MAP_SIZE/30; i++)
+		for (int i = 0; i < MAP_SIZE/ DISTRICT_SIZE; i++)
 		{
-			for (int j = 0; j < MAP_SIZE/30; j++)
+			for (int j = 0; j < MAP_SIZE/ DISTRICT_SIZE; j++)
 			{
 				magicMap[i][j] = 0;
 			}
 		}
 
-		for (int i = 0; i < (MAP_SIZE / 30)*(MAP_SIZE / 30); i++)
+		for (int i = 0; i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE); i++)
 		{
 			for (int j = 0; j < 2; j++)
 			{
@@ -153,7 +155,8 @@ public:
 		{
 			for (int j = 0; j < MAP_SIZE; j++)
 			{
-				population[i][j] = pop[i][j];
+				//population[i][j] = pop[i][j];
+				population[i][j] = pop[j][i];
 			}
 		}
 
@@ -169,15 +172,19 @@ public:
 
 	void MagicMap::giveMeMyMagicMap() {
 
-		for (int magic_x = 0; magic_x < MAP_SIZE / 30; magic_x++)
-		{			for (int magic_y = 0; magic_y < MAP_SIZE / 30; magic_y++)
+		for (int magic_x = 0; magic_x < MAP_SIZE / DISTRICT_SIZE; magic_x++)
+		{			
+			for (int magic_y = 0; magic_y < MAP_SIZE / DISTRICT_SIZE; magic_y++)
 			{
-				for (int pop_x = magic_x * 30; pop_x < magic_x * 30 + 30; pop_x++)
+				for (int pop_x = magic_x * DISTRICT_SIZE; pop_x < magic_x * DISTRICT_SIZE + DISTRICT_SIZE; pop_x++)
 				{
-					for (int pop_y = magic_y * 30; pop_y < magic_y * 30 + 30; pop_y++)
+					for (int pop_y = magic_y * DISTRICT_SIZE; pop_y < magic_y * DISTRICT_SIZE + DISTRICT_SIZE; pop_y++)
 					{
 						magicMap[magic_x][magic_y] += (int)population[pop_x][pop_y];
 					}
+
+					if (debug)
+						cout << "MagicMap population at x: " << magic_x << " , at y: " << magic_y << "is : " << magicMap[magic_x][magic_y] << endl;
 				}
 			}
 
@@ -191,12 +198,12 @@ public:
 
 
 		/* get tower ID for all districts */
-		for (int magic_x = 0; magic_x < MAP_SIZE / 30; magic_x++)
+		for (int magic_x = 0; magic_x < MAP_SIZE / DISTRICT_SIZE; magic_x++)
 		{
-			for (int magic_y = 0; magic_y < MAP_SIZE / 30; magic_y++)
+			for (int magic_y = 0; magic_y < MAP_SIZE / DISTRICT_SIZE; magic_y++)
 			{
-				bigmap_district_center_x = 15 + 30 * magic_x;
-				bigmap_district_center_y = 15 + 30 * magic_y;
+				bigmap_district_center_x = (DISTRICT_SIZE / 2) + (DISTRICT_SIZE * magic_x);
+				bigmap_district_center_y = (DISTRICT_SIZE / 2) + (DISTRICT_SIZE * magic_y);
 				double min_distance = 10000;
 
 				/* get nearest tower to district center */
@@ -209,8 +216,8 @@ public:
 					}
 				}
 
-				population_with_tower_id[magic_x * (MAP_SIZE / 30) + magic_y][0] = magicMap[magic_x][magic_y]; // population in district
-				population_with_tower_id[magic_x * (MAP_SIZE / 30) + magic_y][1] = tower_ID;					 // nearest tower id
+				population_with_tower_id[magic_x * (MAP_SIZE / DISTRICT_SIZE) + magic_y][0] = magicMap[magic_x][magic_y]; // population in district
+				population_with_tower_id[magic_x * (MAP_SIZE / DISTRICT_SIZE) + magic_y][1] = tower_ID;				   // nearest tower id
 			}
 		}
 	}
