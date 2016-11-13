@@ -117,7 +117,7 @@ void TPlayer::makeMove() {
 			for (int i = 0; i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE); i++)
 			{
 				
-				if (tempPop < magicMap.population_with_tower_id[i][0] && !playerTowers.IsItOurTower(magicMap.population_with_tower_id[i][1]))
+				if ((tempPop < magicMap.population_with_tower_id[i][0]) && (inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0))
 				{
 					tempPop = magicMap.population_with_tower_id[i][0];
 					tempID = magicMap.population_with_tower_id[i][1];
@@ -129,38 +129,38 @@ void TPlayer::makeMove() {
 			cout << "tower X: " << map->towers[tempID][0] << endl;
 			cout << "tower Y: " << map->towers[tempID][1] << endl;
 
-			rentTower(tempID, 10, 15, 100);
-			rentTower(38, 10, 20, 100);
+			rentTower(tempID, 10, DISTRICT_SIZE/2, 100);
 			break;
 		case growth:
 			tempPop = 0;
 			tempID = 0;
 			for (int i = 0; i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE); i++)
 			{
-				if (tempPop < magicMap.population_with_tower_id[i][0] && !playerTowers.IsItOurTower(magicMap.population_with_tower_id[i][1]))
+				//if ((tempPop < magicMap.population_with_tower_id[i][0]) && !playerTowers.IsItOurTower(magicMap.population_with_tower_id[i][1]))
+				if ((tempPop < magicMap.population_with_tower_id[i][0]) && (inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0))
 				{
 					tempPop = magicMap.population_with_tower_id[i][0];
 					tempID = magicMap.population_with_tower_id[i][1];
 				}
 			}
 
-			rentTower(tempID, 7, 10, 100);
-			if(inputData.towerInf[124].techLevel < 5)
+			cout << "RENT! " << tempID << endl;
+			rentTower(tempID, 7, DISTRICT_SIZE/2, 100);
+			if(inputData.towerInf[playerTowers.playerTowerIndexes[playerTowers.actualPosition][0]].techLevel < 5)
 				outputData.invest = playerMoneyBuffer.AvarageOfLastFiveMonth()*0.1;
 			break;
 		case stagnation:
-			if (inputData.towerInf[124].techLevel < 5)
+			if (inputData.towerInf[playerTowers.playerTowerIndexes[playerTowers.actualPosition][0]].techLevel < 5)
 				outputData.invest = playerMoneyBuffer.AvarageOfLastFiveMonth()*0.05;
 			break;
 		case decrease:
-			leaveTower(124);
 			break;
 		default:
 			break;
 		}
 
 
-		
+		playerTowers.UpdateTowerData(inputData);
         //if (inputData.header.time == 140) leaveTower(124);
     
 }

@@ -10,7 +10,7 @@
 
 #define SIZE_OF_MONEY_BUFFER 20
 #define PLAYER_TOWER_INDEXES 100
-#define DISTRICT_SIZE 30
+#define DISTRICT_SIZE 25
 using namespace std;
 
 class PlayerTowers
