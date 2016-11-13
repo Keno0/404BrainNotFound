@@ -10,7 +10,7 @@
 
 #define SIZE_OF_MONEY_BUFFER 20
 #define PLAYER_TOWER_INDEXES 100
-#define DISTRICT_SIZE 25
+#define DISTRICT_SIZE 30  //Best around 20-25
 using namespace std;
 
 class PlayerTowers
@@ -113,7 +113,6 @@ public:
 				{
 
 					AddTowerToBlacklist(playerTowerIndexes[i][0]);
-					cout << "blacklist: " << playerTowerIndexes[i][0] << endl;
 					Remove(playerTowerIndexes[i][0]);
 				}
 

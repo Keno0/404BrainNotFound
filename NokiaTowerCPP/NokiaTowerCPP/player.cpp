@@ -106,48 +106,79 @@ void TPlayer::makeMove() {
 
 	int tempPop = 0;
 	int tempID = 0;
+	int previousTempID = 0;
+	int money = inputData.header.money;
+	int rentingCost = 7;
+
+	//for (int i = 0; i < playerTowers.actualPositionOfBlackList; i++)
+	//{
+	//	if (playerTowers.playerBlackListTower[i][1] == 1)
+	//	{
+	//		leaveTower(playerTowers.playerBlackListTower[i][0]);
+	//		playerTowers.playerBlackListTower[i][1] = 0;
+	//	}
+	//}
+
+
 
 	playerMoneyBuffer.Add(inputData.header.money);
-		cout << " current state : " << state << endl;
 		switch (state)
 		{
 		case initState:	
-			tempPop = 0;
+			
 			tempID = 0;
-			for (int i = 0; i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE); i++)
+			previousTempID = -1;
+			
+			while ((money > (inputData.header.money*(1 - 0.01*DISTRICT_SIZE))) && (previousTempID != tempID))
 			{
-				
-				if ((tempPop < magicMap.population_with_tower_id[i][0]) && (inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0))
+				tempPop = 75*DISTRICT_SIZE;
+				previousTempID = tempID;
+				for (int i = 0; i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE); i++)
 				{
-					tempPop = magicMap.population_with_tower_id[i][0];
-					tempID = magicMap.population_with_tower_id[i][1];
+
+					if ((tempPop < magicMap.population_with_tower_id[i][0]) && (inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0))
+					{
+						tempPop = magicMap.population_with_tower_id[i][0];
+						tempID = magicMap.population_with_tower_id[i][1];
+					}
+				}
+				inputData.towerInf[tempID].owner = 1;
+				if (previousTempID != tempID)
+				{
+					rentTower(tempID, rentingCost, DISTRICT_SIZE*0.8, 100);
+					money -= rentingCost;					
 				}
 			}
-
-			cout << "max pop: " << tempPop << endl;
-			cout << "max pop tower ID: " << tempID << endl;
-			cout << "tower X: " << map->towers[tempID][0] << endl;
-			cout << "tower Y: " << map->towers[tempID][1] << endl;
-
-			rentTower(tempID, 10, DISTRICT_SIZE/2, 100);
 			break;
 		case growth:
-			tempPop = 0;
+			
 			tempID = 0;
-			for (int i = 0; i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE); i++)
+			previousTempID = -1;
+			while (money > inputData.header.money*(1-0.01*DISTRICT_SIZE) && previousTempID != tempID)
 			{
-				//if ((tempPop < magicMap.population_with_tower_id[i][0]) && !playerTowers.IsItOurTower(magicMap.population_with_tower_id[i][1]))
-				if ((tempPop < magicMap.population_with_tower_id[i][0]) && (inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0))
+				tempPop = 75 * DISTRICT_SIZE;
+				previousTempID = tempID;
+				for (int i = 0; i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE); i++)
 				{
-					tempPop = magicMap.population_with_tower_id[i][0];
-					tempID = magicMap.population_with_tower_id[i][1];
+					//if ((tempPop < magicMap.population_with_tower_id[i][0]) && !playerTowers.IsItOurTower(magicMap.population_with_tower_id[i][1]))
+					if ((tempPop < magicMap.population_with_tower_id[i][0]) && (inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0) && !playerTowers.IsItTowerInBlackList(magicMap.population_with_tower_id[i][1]))
+					{
+						tempPop = magicMap.population_with_tower_id[i][0];
+						tempID = magicMap.population_with_tower_id[i][1];
+						
+					}
+				}
+				inputData.towerInf[tempID].owner = 1;
+				
+				if (previousTempID != tempID)
+				{
+					rentTower(tempID, rentingCost, DISTRICT_SIZE*0.8, 100);
+					money -= rentingCost;
+					previousTempID = tempID;
 				}
 			}
-
-			cout << "RENT! " << tempID << endl;
-			rentTower(tempID, 7, DISTRICT_SIZE/2, 100);
 			if(inputData.towerInf[playerTowers.playerTowerIndexes[playerTowers.actualPosition][0]].techLevel < 5)
-				outputData.invest = playerMoneyBuffer.AvarageOfLastFiveMonth()*0.1;
+				outputData.invest = playerMoneyBuffer.AvarageOfLastFiveMonth()*0.15;
 			break;
 		case stagnation:
 			if (inputData.towerInf[playerTowers.playerTowerIndexes[playerTowers.actualPosition][0]].techLevel < 5)
