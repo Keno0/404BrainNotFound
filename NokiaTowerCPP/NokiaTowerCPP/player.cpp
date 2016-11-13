@@ -99,39 +99,46 @@ void TPlayer::makeMove() {
     outputData.invest = 0;
     outputData.numOrders = 0;
 
+	state=determinateCurrentState(inputData, playerMoneyBuffer);
+
 	AddTowersIfItsOur();
 	
-	if(inputData.header.time< 2)
-        if (inputData.header.time == 1) rentTower(124, 10, 35, 100);
-		cout << "money:" << inputData.header.money << endl;
-		if (inputData.header.time == 1) {
-			rentTower(27,7.1, 3, 1);
-			rentTower(28, 8.01, 4, 1);
-			rentTower(29, 9.001, 5, 1);
-			rentTower(30, 10.0001, 6, 1);
-			
-		}
-        if (inputData.header.time > 10 && inputData.header.time < 120) outputData.invest = inputData.header.time;
-	{
-		state = initState;
-		
-	}
-	else
-	{
-		state = determinateCurrentState(inputData, playerMoneyBuffer);
-	}
 
+	int tempPop = 0;
+	int tempID = 0;
 
 	playerMoneyBuffer.Add(inputData.header.money);
 		cout << " current state : " << state << endl;
 		switch (state)
 		{
 		case initState:	
-			maxPop(map->pop, maxPopLocationX, maxPopLocationY);
-			rentTower(maxPopTower(map->towers, map->towerMap, maxPopLocationX, maxPopLocationY), 10, 35, 100);
-			rentTower(124, 10, 35, 100);
+			tempPop = 0;
+			tempID = 0;
+			for (int i = 0; i < (MAP_SIZE / 30)*(MAP_SIZE / 30); i++)
+			{
+				
+				if (tempPop < magicMap.population_with_tower_id[i][0] && !playerTowers.IsItOurTower(magicMap.population_with_tower_id[i][1]))
+				{
+					tempPop = magicMap.population_with_tower_id[i][0];
+					tempID = magicMap.population_with_tower_id[i][1];
+				}
+			}
+
+			rentTower(tempID, 10, 35, 100);
 			break;
 		case growth:
+			tempPop = 0;
+			tempID = 0;
+			for (int i = 0; i < (MAP_SIZE / 30)*(MAP_SIZE / 30); i++)
+			{
+				if (tempPop < magicMap.population_with_tower_id[i][0] && !playerTowers.IsItOurTower(magicMap.population_with_tower_id[i][1]))
+				{
+					tempPop = magicMap.population_with_tower_id[i][0];
+					tempID = magicMap.population_with_tower_id[i][1];
+				}
+			}
+
+			rentTower(tempID, 7, 10, 100);
 			if(inputData.towerInf[124].techLevel < 5)
 				outputData.invest = playerMoneyBuffer.AvarageOfLastFiveMonth()*0.1;
 			break;
