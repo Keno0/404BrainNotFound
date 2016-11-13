@@ -109,6 +109,16 @@ void TPlayer::makeMove() {
 
 	playerMoneyBuffer.Add(inputData.header.money);
 		cout << " current state : " << state << endl;
+		for (int i = 0; i < playerTowers.actualPositionOfBlackList; i++)
+		{
+			if (playerTowers.playerBlackListTower[i][1] == 1)
+			{
+				leaveTower(playerTowers.playerBlackListTower[i][0]);
+				playerTowers.playerBlackListTower[i][1] =0;
+			}
+
+		}
+
 		switch (state)
 		{
 		case initState:	
@@ -124,7 +134,7 @@ void TPlayer::makeMove() {
 				}
 			}
 
-			rentTower(tempID, 10, 35, 100);
+			rentTower(124, 10, 35, 1000);
 			break;
 		case growth:
 			tempPop = 0;
@@ -137,7 +147,7 @@ void TPlayer::makeMove() {
 					tempID = magicMap.population_with_tower_id[i][1];
 				}
 			}
-
+			cout << "tempID: " << tempID << endl;
 			rentTower(tempID, 7, 10, 100);
 			if(inputData.towerInf[124].techLevel < 5)
 				outputData.invest = playerMoneyBuffer.AvarageOfLastFiveMonth()*0.1;
@@ -147,11 +157,12 @@ void TPlayer::makeMove() {
 				outputData.invest = playerMoneyBuffer.AvarageOfLastFiveMonth()*0.05;
 			break;
 		case decrease:
-			leaveTower(124);
 			break;
 		default:
 			break;
 		}
+
+		playerTowers.UpdateTowerData(inputData);
 
 
 		

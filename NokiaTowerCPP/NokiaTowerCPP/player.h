@@ -15,20 +15,41 @@ using namespace std;
 class PlayerTowers
 {
 public:
-	int playerTowerIndexes[PLAYER_TOWER_INDEXES];
-	int actualPosition=0;
+	int playerTowerIndexes[PLAYER_TOWER_INDEXES][5]; //[i][0]: tower index, [i][1]: max costumer, [i][2]:maxprofit, [i][3]: current customer, [i][4]: current profit
+	int actualPosition=0, actualPositionOfBlackList=0;
+	int playerBlackListTower[PLAYER_TOWER_INDEXES][2]; //index, leaved
 
 	PlayerTowers()
 	{
 		for (int i = 0; i < PLAYER_TOWER_INDEXES; i++)
-			playerTowerIndexes[i] = -1;
+		{
+			playerBlackListTower[i][0] = -1;
+			playerBlackListTower[i][1] = -1;
+			for (int j = 0; j < 5; j++)
+			{
+				playerTowerIndexes[i][j] = -1;
+			}
+		}			
+	}
+
+
+	void AddTowerToBlacklist(int towerID)
+	{
+		if (actualPositionOfBlackList < PLAYER_TOWER_INDEXES)
+		{
+			playerBlackListTower[actualPositionOfBlackList][0] = towerID;
+			playerBlackListTower[actualPositionOfBlackList][1] = 1;
+			actualPositionOfBlackList++;
+		}
+		else
+			actualPositionOfBlackList = 0;
 	}
 
 	void Add(int towerID)
 	{
 		if (actualPosition < PLAYER_TOWER_INDEXES)
 		{
-			playerTowerIndexes[actualPosition] = towerID;
+			playerTowerIndexes[actualPosition][0] = towerID;
 			actualPosition++;
 		}
 		else
@@ -39,9 +60,12 @@ public:
 	{
 		for (int i = 0; i <= actualPosition; i++)
 		{
-			if (playerTowerIndexes[i] == towerID)
+			if (playerTowerIndexes[i][0] == towerID)
 			{
-				playerTowerIndexes[i] = -1;
+				playerTowerIndexes[i][0] = -1;
+				playerTowerIndexes[i][1] = -1;
+				playerTowerIndexes[i][2] = -1;
+
 			}
 		}
 	}
@@ -50,11 +74,56 @@ public:
 	{
 		for (int i = 0; i <= actualPosition; i++)
 		{
-			if (playerTowerIndexes[i] == towerID)
+			if (playerTowerIndexes[i][0] == towerID)
 				return true;
 		}
 
 		return false;
+	}
+
+	bool IsItTowerInBlackList(int towerID)
+	{
+		for (int i = 0; i <= actualPositionOfBlackList; i++)
+		{
+			if (playerBlackListTower[i][0] == towerID)
+				return true;
+		}
+
+		return false;
+	}
+
+	void UpdateTowerData(TinputData inputData)
+	{
+		//[i][0]: tower index, [i][1]: max costumer, [i][2]:maxprofit, [i][3]: current customer, [i][4]: current profit
+		for (int i = 0; i < actualPosition; i++)
+		{
+			if (playerTowerIndexes[i][0] != -1)
+			{
+				if (inputData.towerInf[playerTowerIndexes[i][0]].cust > playerTowerIndexes[i][1])
+				{
+					playerTowerIndexes[i][1] = inputData.towerInf[playerTowerIndexes[i][0]].cust;
+				}
+
+				playerTowerIndexes[i][3] = inputData.towerInf[playerTowerIndexes[i][0]].cust;
+
+				if (TowerProfit(inputData.towerInf[playerTowerIndexes[i][0]]) > playerTowerIndexes[i][2])
+					playerTowerIndexes[i][2] = TowerProfit(inputData.towerInf[playerTowerIndexes[i][0]]);
+				else if (TowerProfit(inputData.towerInf[playerTowerIndexes[i][0]]) <= 0)
+				{
+
+					AddTowerToBlacklist(playerTowerIndexes[i][0]);
+					cout << "blacklist: " << playerTowerIndexes[i][0] << endl;
+					Remove(playerTowerIndexes[i][0]);
+				}
+
+				playerTowerIndexes[i][4] = TowerProfit(inputData.towerInf[playerTowerIndexes[i][0]]);
+			}
+		}
+	}
+
+	int TowerProfit(TtowerInfRec towerInfo)
+	{
+		return towerInfo.cust * towerInfo.offer*0.000001 - (towerInfo.rentingCost + towerInfo.runningCost);
 	}
 	
 };
