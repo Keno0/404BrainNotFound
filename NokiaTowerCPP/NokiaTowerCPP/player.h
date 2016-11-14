@@ -286,8 +286,25 @@ public:
 				}
 
 				population_with_tower_id[magic_x * (MAP_SIZE / DISTRICT_SIZE) + magic_y][0] = magicMap[magic_x][magic_y]; // population in district
-				population_with_tower_id[magic_x * (MAP_SIZE / DISTRICT_SIZE) + magic_y][1] = tower_ID;				   // nearest tower id
+				population_with_tower_id[magic_x * (MAP_SIZE / DISTRICT_SIZE) + magic_y][1] = tower_ID;				      // nearest tower id
 			}
+		}
+
+		/* order towers by population */
+		for (int i = 1; i < sizeof(population_with_tower_id); i++)
+		{
+			int j = i - 1;
+			int temp_pop = population_with_tower_id[i][0];
+			int temp_tower_id = population_with_tower_id[i][1];
+			while ( j>=0 && population_with_tower_id[j][0] > temp_pop )
+			{
+				population_with_tower_id[j + 1][0] = population_with_tower_id[j][0];
+				population_with_tower_id[j + 1][1] = population_with_tower_id[j][1];
+				j--;
+			}
+
+			population_with_tower_id[j + 1][0] = temp_pop;
+			population_with_tower_id[j + 1][1] = temp_tower_id;
 		}
 	}
 
