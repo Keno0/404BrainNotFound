@@ -291,7 +291,7 @@ public:
 		}
 
 		/* order towers by population */
-		for (int i = 1; i < sizeof(population_with_tower_id); i++)
+		for (int i = 1; i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE); i++)
 		{
 			int j = i - 1;
 			int temp_pop = population_with_tower_id[i][0];
@@ -306,6 +306,22 @@ public:
 			population_with_tower_id[j + 1][0] = temp_pop;
 			population_with_tower_id[j + 1][1] = temp_tower_id;
 		}
+
+		/* reverse the array - biggest population first */
+		std::reverse(std::begin(population_with_tower_id), std::end(population_with_tower_id));
+		if (debug) {
+			cout << "DEBUG" << endl << endl << endl;
+			cout << "population" << endl;
+			cout << population_with_tower_id[0][0] << endl;
+			cout << population_with_tower_id[1][0] << endl;
+			cout << population_with_tower_id[2][0] << endl;
+			cout << population_with_tower_id[3][0] << endl;
+			cout << population_with_tower_id[4][0] << endl;
+			cout << population_with_tower_id[5][0] << endl;
+			cout << population_with_tower_id[6][0] << endl;
+			cout << "DEBUG END" << endl;
+		}
+
 	}
 
 };
