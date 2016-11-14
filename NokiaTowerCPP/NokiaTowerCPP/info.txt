@@ -7,3 +7,10 @@ renting cost max =
 running cost = ( distance * 0.2 )^2
 
 profit = income - renting cost - running cost
+
+
+Business logic
+Init state:
+	-money 20%-a torony vásárlásra
+	-renting cost: 7
+	-offer: költség +20%

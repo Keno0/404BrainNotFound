@@ -1,5 +1,10 @@
 #include "player.h"
 
+#define PLAN_PROFIT 1.2 // used for calculate the offer when try to rent a tower, 0.2 = 20% profit
+#define PROFIT_PER_CUSTOMER 0.00001
+#define PREDICT_OF_CUSTUMER_OF_A_TOWER 0.2 //20%-a district population-nek
+
+
 using namespace std;
 
 //-------------------------------------------------------------------
@@ -84,6 +89,10 @@ States determinateCurrentState(TinputData inputData, MoneyBuffer moneyBuffer)
 	return state;
 }
 
+double CalculateOffer(int distance,int rentingCost, int disctrictCustomer, int towerID)
+{
+	return ((1 + PLAN_PROFIT)*(distance*distance*0.04 + rentingCost) / (disctrictCustomer*PROFIT_PER_CUSTOMER*PREDICT_OF_CUSTUMER_OF_A_TOWER));
+}
 
 void TPlayer::makeMove() {
 
@@ -104,9 +113,7 @@ void TPlayer::makeMove() {
 	AddTowersIfItsOur();
 	
 
-	int tempPop = 0;
-	int tempID = 0;
-	int previousTempID = 0;
+	int tempPop = 150000;
 	int money = inputData.header.money;
 	int rentingCost = 7;
 	int i = 0;
@@ -126,29 +133,33 @@ void TPlayer::makeMove() {
 		switch (state)
 		{
 		case initState:	
-			i = 0;
-			tempPop = 75 * DISTRICT_SIZE;
 			
-			while (money > (inputData.header.money*(1 - 0.015*DISTRICT_SIZE)) && magicMap.population_with_tower_id[i][0]>tempPop)
+			while (money > (inputData.header.money*0.95) && magicMap.population_with_tower_id[i][0]>tempPop)
 			{			
 
-			    rentTower(magicMap.population_with_tower_id[i][1], rentingCost, DISTRICT_SIZE*0.8, 100);
-			    money -= rentingCost;
+				if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0))
+				{
+					rentTower(magicMap.population_with_tower_id[i][1], rentingCost, 10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0],
+						CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0],rentingCost, magicMap.population_with_tower_id[i][0], magicMap.population_with_tower_id[i][1]));
+					money -= rentingCost;
+				}
 				i++;
 				
 			}
 			break;
 		case growth:
-			i = 0;
-			tempPop = 75 * DISTRICT_SIZE;
 
-			while (money > (inputData.header.money*(1 - 0.010*DISTRICT_SIZE)) && magicMap.population_with_tower_id[i][0]>tempPop)
+			while (money > inputData.header.money*0.9 && magicMap.population_with_tower_id[i][0]>tempPop)
 			{
 
-				rentTower(magicMap.population_with_tower_id[i][1], rentingCost, DISTRICT_SIZE*0.8, 100);
-				money -= rentingCost;
+				if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0))
+				{
+					rentTower(magicMap.population_with_tower_id[i][1], rentingCost, 10 + DISTRICT_SIZE*0.000001* magicMap.population_with_tower_id[i][0], 
+						CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], rentingCost, magicMap.population_with_tower_id[i][0], magicMap.population_with_tower_id[i][1]));
+					money -= rentingCost;
+					cout << "tower pop: " << magicMap.population_with_tower_id[i][0] << endl;
+				}
 				i++;
-
 			}
 
 			if(inputData.towerInf[playerTowers.playerTowerIndexes[playerTowers.actualPosition][0]].techLevel < 5)
