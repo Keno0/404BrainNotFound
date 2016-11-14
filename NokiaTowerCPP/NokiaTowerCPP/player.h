@@ -4,6 +4,7 @@
 #include <sstream>
 #include <iostream>
 #include <string>
+#include <ctime>
 
 #include "decl.h"
 #include "map.h"
@@ -317,11 +318,15 @@ public:
     ~TPlayer() { if (map) delete this->map; }
 
     void init() {
+		time_t initTime = time(0);
         map = new Map();
         map->GenerateMap(headerIni.seed);
 		magicMap.setValues(map->pop, map->towers);
 		magicMap.giveMeMyMagicMap();
 		magicMap.giveMeMyTowerPopulation();
+
+		initTime = time(0) - initTime;
+		cout << "initTime: " << initTime << " seconds" << endl << endl;
     }
 
 
