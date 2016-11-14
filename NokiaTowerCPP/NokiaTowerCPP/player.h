@@ -12,6 +12,10 @@
 #define SIZE_OF_MONEY_BUFFER 20
 #define PLAYER_TOWER_INDEXES 100
 #define DISTRICT_SIZE 25  //Best around 20-25
+#define CUSTOMER_CHANGES 10000
+#define PLAN_PROFIT 1.2 // used for calculate the offer when try to rent a tower, 0.2 = 20% profit
+#define PROFIT_PER_CUSTOMER 0.00001
+#define PREDICT_OF_CUSTUMER_OF_A_TOWER 0.2 //20%-a district population-nek
 using namespace std;
 
 class PlayerTowers
@@ -106,7 +110,10 @@ public:
 					playerTowerIndexes[i][1] = inputData.towerInf[playerTowerIndexes[i][0]].cust;
 				}
 
-				playerTowerIndexes[i][3] = inputData.towerInf[playerTowerIndexes[i][0]].cust;
+				if (inputData.towerInf[playerTowerIndexes[i][0]].cust + CUSTOMER_CHANGES > playerTowerIndexes[i][3])
+					playerTowerIndexes[i][3] = inputData.towerInf[playerTowerIndexes[i][0]].cust;
+				else if (inputData.towerInf[playerTowerIndexes[i][0]].cust - CUSTOMER_CHANGES < playerTowerIndexes[i][3])
+					playerTowerIndexes[i][3] = inputData.towerInf[playerTowerIndexes[i][0]].cust;
 
 				if (TowerProfit(inputData.towerInf[playerTowerIndexes[i][0]]) > playerTowerIndexes[i][2])
 					playerTowerIndexes[i][2] = TowerProfit(inputData.towerInf[playerTowerIndexes[i][0]]);
@@ -407,6 +414,37 @@ public:
 				if (!playerTowers.IsItOurTower(i))
 					playerTowers.Add(i);
 		}
+	}
+	//[i][0]: tower index, [i][1]: max costumer, [i][2]:maxprofit, [i][3]: current customer, [i][4]: current profit
+	void HandleCostumerChange()
+	{
+		
+		for (int i = 0; i < playerTowers.actualPosition; i++)
+		{
+			if ((playerTowers.playerTowerIndexes[i][3] - inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust) > CUSTOMER_CHANGES)
+			{
+				int tempOffer = PalyerCalculateMinimumOffer(playerTowers.playerTowerIndexes[i][0]);
+				if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.9 < tempOffer)
+				{					
+					changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
+						tempOffer);
+				}
+				else
+					changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
+					inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.9);
+			}
+
+			else if ((inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust - playerTowers.playerTowerIndexes[i][3]) > CUSTOMER_CHANGES)
+			{
+				changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
+					inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*1.1);
+			}
+		}
+	}
+
+	double PalyerCalculateMinimumOffer(int towerID)
+	{
+		return ((inputData.towerInf[towerID].rentingCost + inputData.towerInf[towerID].runningCost) / (inputData.towerInf[towerID].cust *PROFIT_PER_CUSTOMER));
 	}
 
 protected:

@@ -1,9 +1,5 @@
 #include "player.h"
 
-#define PLAN_PROFIT 1.2 // used for calculate the offer when try to rent a tower, 0.2 = 20% profit
-#define PROFIT_PER_CUSTOMER 0.00001
-#define PREDICT_OF_CUSTUMER_OF_A_TOWER 0.2 //20%-a district population-nek
-
 
 using namespace std;
 
@@ -89,7 +85,7 @@ States determinateCurrentState(TinputData inputData, MoneyBuffer moneyBuffer)
 	return state;
 }
 
-double CalculateOffer(int distance,int rentingCost, int disctrictCustomer, int towerID)
+double CalculateOffer(int distance,int rentingCost, int disctrictCustomer)
 {
 	return ((1 + PLAN_PROFIT)*(distance*distance*0.04 + rentingCost) / (disctrictCustomer*PROFIT_PER_CUSTOMER*PREDICT_OF_CUSTUMER_OF_A_TOWER));
 }
@@ -140,7 +136,7 @@ void TPlayer::makeMove() {
 				if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0))
 				{
 					rentTower(magicMap.population_with_tower_id[i][1], rentingCost, 10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0],
-						CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0],rentingCost, magicMap.population_with_tower_id[i][0], magicMap.population_with_tower_id[i][1]));
+						CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0],rentingCost, magicMap.population_with_tower_id[i][0]));
 					money -= rentingCost;
 				}
 				i++;
@@ -155,7 +151,7 @@ void TPlayer::makeMove() {
 				if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0))
 				{
 					rentTower(magicMap.population_with_tower_id[i][1], rentingCost, 10 + DISTRICT_SIZE*0.000001* magicMap.population_with_tower_id[i][0], 
-						CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], rentingCost, magicMap.population_with_tower_id[i][0], magicMap.population_with_tower_id[i][1]));
+						CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], rentingCost, magicMap.population_with_tower_id[i][0]));
 					money -= rentingCost;
 					cout << "tower pop: " << magicMap.population_with_tower_id[i][0] << endl;
 				}
@@ -175,7 +171,7 @@ void TPlayer::makeMove() {
 			break;
 		}
 
-
+		HandleCostumerChange();
 		playerTowers.UpdateTowerData(inputData);
         //if (inputData.header.time == 140) leaveTower(124);
     
