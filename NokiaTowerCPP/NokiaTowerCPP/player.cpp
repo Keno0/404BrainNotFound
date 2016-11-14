@@ -109,6 +109,7 @@ void TPlayer::makeMove() {
 	int previousTempID = 0;
 	int money = inputData.header.money;
 	int rentingCost = 7;
+	int i = 0;
 
 	//for (int i = 0; i < playerTowers.actualPositionOfBlackList; i++)
 	//{
@@ -125,58 +126,31 @@ void TPlayer::makeMove() {
 		switch (state)
 		{
 		case initState:	
+			i = 0;
+			tempPop = 75 * DISTRICT_SIZE;
 			
-			tempID = 0;
-			previousTempID = -1;
-			
-			while ((money > (inputData.header.money*(1 - 0.01*DISTRICT_SIZE))) && (previousTempID != tempID))
-			{
-				tempPop = 75*DISTRICT_SIZE;
-				previousTempID = tempID;
-				for (int i = 0; i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE); i++)
-				{
+			while (money > (inputData.header.money*(1 - 0.015*DISTRICT_SIZE)) && magicMap.population_with_tower_id[i][0]>tempPop)
+			{			
 
-					if ((tempPop < magicMap.population_with_tower_id[i][0]) && (inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0))
-					{
-						tempPop = magicMap.population_with_tower_id[i][0];
-						tempID = magicMap.population_with_tower_id[i][1];
-					}
-				}
-				inputData.towerInf[tempID].owner = 1;
-				if (previousTempID != tempID)
-				{
-					rentTower(tempID, rentingCost, DISTRICT_SIZE*0.8, 100);
-					money -= rentingCost;					
-				}
+			    rentTower(magicMap.population_with_tower_id[i][1], rentingCost, DISTRICT_SIZE*0.8, 100);
+			    money -= rentingCost;
+				i++;
+				
 			}
 			break;
 		case growth:
-			
-			tempID = 0;
-			previousTempID = -1;
-			while (money > inputData.header.money*(1-0.01*DISTRICT_SIZE) && previousTempID != tempID)
+			i = 0;
+			tempPop = 75 * DISTRICT_SIZE;
+
+			while (money > (inputData.header.money*(1 - 0.010*DISTRICT_SIZE)) && magicMap.population_with_tower_id[i][0]>tempPop)
 			{
-				tempPop = 75 * DISTRICT_SIZE;
-				previousTempID = tempID;
-				for (int i = 0; i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE); i++)
-				{
-					//if ((tempPop < magicMap.population_with_tower_id[i][0]) && !playerTowers.IsItOurTower(magicMap.population_with_tower_id[i][1]))
-					if ((tempPop < magicMap.population_with_tower_id[i][0]) && (inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0) && !playerTowers.IsItTowerInBlackList(magicMap.population_with_tower_id[i][1]))
-					{
-						tempPop = magicMap.population_with_tower_id[i][0];
-						tempID = magicMap.population_with_tower_id[i][1];
-						
-					}
-				}
-				inputData.towerInf[tempID].owner = 1;
-				
-				if (previousTempID != tempID)
-				{
-					rentTower(tempID, rentingCost, DISTRICT_SIZE*0.8, 100);
-					money -= rentingCost;
-					previousTempID = tempID;
-				}
+
+				rentTower(magicMap.population_with_tower_id[i][1], rentingCost, DISTRICT_SIZE*0.8, 100);
+				money -= rentingCost;
+				i++;
+
 			}
+
 			if(inputData.towerInf[playerTowers.playerTowerIndexes[playerTowers.actualPosition][0]].techLevel < 5)
 				outputData.invest = playerMoneyBuffer.AvarageOfLastFiveMonth()*0.15;
 			break;
