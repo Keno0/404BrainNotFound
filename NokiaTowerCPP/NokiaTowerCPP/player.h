@@ -486,7 +486,7 @@ public:
 			}
 			//licit to another player's tower
 			else if (inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner != ID
-				&& inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitID != ID  && magicMap.population_with_tower_id[i][0]>DEFAULT_POPULATION) //not our tower
+				&& inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitID != ID  && magicMap.population_with_tower_id[i][0]>DEFAULT_POPULATION && money > inputData.header.money*0.95) //not our tower
 			{
 				//worth to overlicit?
 				if (inputData.towerInf[magicMap.population_with_tower_id[i][1]].licit > 0)
@@ -498,11 +498,29 @@ public:
 				double maximumRentingCost = CalculateMaximumPriceOfRent(magicMap.population_with_tower_id[i][0], distance, offer);
 				double ourOfferForRenting = currentRentingCost + (maximumRentingCost - currentRentingCost) *0.25;
 				cout << "maximumRentingCost: " << maximumRentingCost << endl;
-				if (maximumRentingCost > currentRentingCost) // skip towers which are not profitable
+				if (maximumRentingCost > ourOfferForRenting) // skip towers which are not profitable
 				{
 					cout << "licit tower ID: " << magicMap.population_with_tower_id[i][1] << endl;
 					rentTower(magicMap.population_with_tower_id[i][1], ourOfferForRenting, distance, offer);
 					money -= ourOfferForRenting;
+				}
+			}
+			// ha esetleg a mi tornyainkat licitálják
+			else if (inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == ID
+				&& inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitID != 0
+				&& inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitDelay < 3)
+			{
+				if (inputData.towerInf[magicMap.population_with_tower_id[i][1]].licit > 0)
+					currentRentingCost = inputData.towerInf[magicMap.population_with_tower_id[i][1]].licit+1;
+				else
+					currentRentingCost = inputData.towerInf[magicMap.population_with_tower_id[i][1]].rentingCost + 1;
+
+				double offer = CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], currentRentingCost, magicMap.population_with_tower_id[i][0]);
+				double maximumRentingCost = CalculateMaximumPriceOfRent(magicMap.population_with_tower_id[i][0], distance, offer);
+				if (maximumRentingCost > currentRentingCost) // skip towers which are not profitable
+				{
+					rentTower(magicMap.population_with_tower_id[i][1], currentRentingCost, distance, offer);
+					money -= currentRentingCost;
 				}
 			}
 			i++;
