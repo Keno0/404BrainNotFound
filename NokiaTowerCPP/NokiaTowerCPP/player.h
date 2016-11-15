@@ -16,7 +16,7 @@
 #define PLAN_PROFIT 1.2 // used for calculate the offer when try to rent a tower, 0.2 = 20% profit
 #define PROFIT_PER_CUSTOMER 0.00001
 #define PREDICT_OF_CUSTUMER_OF_A_TOWER 0.2 //20%-a district population-nek
-#define DEFAULT_RENTING_COST 7
+#define DEFAULT_RENTING_COST 10
 #define DEFAULT_POPULATION 150000 // ez alatti district population-nél nem veszünk tornyot
 using namespace std;
 
@@ -473,7 +473,7 @@ public:
 		int i = 0;
 		int distance = 0;
 		int currentRentingCost = 0;
-		while (money > inputData.header.money*0.9 && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)))
+		while (money > inputData.header.money*0.95 && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)))
 		{
 			distance = getDistanceForRent(magicMap.population_with_tower_id[i][0]);
 			// rent free towers

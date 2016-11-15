@@ -113,6 +113,7 @@ void TPlayer::makeMove() {
 	int i = 0;
 	double currentRentingCost = 0;
 	double distance = 0;
+	int randomTower = 0;
 
 	//for (int i = 0; i < playerTowers.actualPositionOfBlackList; i++)
 	//{
@@ -132,10 +133,10 @@ void TPlayer::makeMove() {
 			
 			while ((money > (inputData.header.money*0.95)) && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)))
 			{			
-
-				if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0) && magicMap.population_with_tower_id[i][0]>DEFAULT_POPULATION)
+				randomTower = magicMap.population_with_tower_id[i][1] + 1;
+				if ((inputData.towerInf[randomTower].owner == 0) && magicMap.population_with_tower_id[i][0]>DEFAULT_POPULATION)
 				{
-					rentTower(magicMap.population_with_tower_id[i][1], DEFAULT_RENTING_COST, 10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0],
+					rentTower(randomTower, DEFAULT_RENTING_COST, 10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0],
 						CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], DEFAULT_RENTING_COST, magicMap.population_with_tower_id[i][0]));
 					money -= DEFAULT_RENTING_COST;
 				}
