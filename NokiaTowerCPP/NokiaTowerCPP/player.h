@@ -424,23 +424,31 @@ public:
 		
 		for (int i = 0; i < playerTowers.actualPosition; i++)
 		{
-			if ((playerTowers.playerTowerIndexes[i][3] - inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust) > CUSTOMER_CHANGES)
-			{
-				int tempOffer = PalyerCalculateMinimumOffer(playerTowers.playerTowerIndexes[i][0]);
-				if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.9 < tempOffer)
-				{					
-					changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
-						tempOffer);
-				}
-				else
-					changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
-					inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.9);
-			}
-
-			else if ((inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust - playerTowers.playerTowerIndexes[i][3]) > CUSTOMER_CHANGES)
-			{
+			if(inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust < 100000)
+			{ 
 				changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
-					inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*1.1);
+					30);
+			}
+			else
+			{
+				if ((playerTowers.playerTowerIndexes[i][3] - inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust) > CUSTOMER_CHANGES)
+				{
+					int tempOffer = PalyerCalculateMinimumOffer(playerTowers.playerTowerIndexes[i][0]);
+					if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.9 < tempOffer)
+					{
+						changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
+							tempOffer);
+					}
+					else
+						changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
+							inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.9);
+				}
+
+				else if ((inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust - playerTowers.playerTowerIndexes[i][3]) > CUSTOMER_CHANGES)
+				{
+					changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
+						inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*1.1);
+				}
 			}
 		}
 	}
