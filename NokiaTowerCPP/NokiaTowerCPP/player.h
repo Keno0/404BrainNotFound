@@ -442,17 +442,32 @@ public:
 		}
 	}
 
+	void HandleTowerDistance()
+	{
+		for (int i = 0; i < playerTowers.actualPosition; i++)
+		{
+			if(inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance < 15)
+				changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], 15,
+					inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer);
+		}
+	}
+
 	double PalyerCalculateMinimumOffer(int towerID)
 	{
 		return ((inputData.towerInf[towerID].rentingCost + inputData.towerInf[towerID].runningCost) / (inputData.towerInf[towerID].cust *PROFIT_PER_CUSTOMER));
 	}
 
 	double CalculateMaximumPriceOfRent(int customer, double distance, double offer) {
-
+		cout << "MAX fv, customer: " << customer << "distance: " << distance << "offer: " << offer << endl;
 		double income = customer*PROFIT_PER_CUSTOMER*PREDICT_OF_CUSTUMER_OF_A_TOWER*offer;
 		double runnungCost = distance*distance*0.04;
-
+		cout << "MAX fv, income: " << income << "runnungCost: " << runnungCost << endl;
 		return income - runnungCost;			
+	}
+
+	void GrowthStateLogic()
+	{
+
 	}
 
 protected:

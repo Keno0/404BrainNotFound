@@ -119,6 +119,8 @@ void TPlayer::makeMove() {
 	int money = inputData.header.money;
 	int rentingCost = 7;
 	int i = 0;
+	double currentRentingCost = 0;
+	double distance = 0;
 
 	//for (int i = 0; i < playerTowers.actualPositionOfBlackList; i++)
 	//{
@@ -153,8 +155,8 @@ void TPlayer::makeMove() {
 
 			while (money > inputData.header.money*0.9 && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)))
 			{
-				double distance = getDistanceForRent(magicMap.population_with_tower_id[i][0]);
-
+				distance = getDistanceForRent(magicMap.population_with_tower_id[i][0]);
+				// rent free towers
 				if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0) && magicMap.population_with_tower_id[i][0]>tempPop)
 				{
 					rentTower(magicMap.population_with_tower_id[i][1], rentingCost, distance,
@@ -162,18 +164,23 @@ void TPlayer::makeMove() {
 					money -= rentingCost;
 					cout << "tower pop: " << magicMap.population_with_tower_id[i][0] << endl;
 				}
+				//licit to another player's tower
 				else if ( inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner != ID 
 					   && inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitID != ID  && magicMap.population_with_tower_id[i][0]>tempPop) //not our tower
 				{
 					//worth to overlicit?
-					double currentRentingCost = inputData.towerInf[magicMap.population_with_tower_id[i][1]].licit;
+					if (inputData.towerInf[magicMap.population_with_tower_id[i][1]].licit > 0)
+						currentRentingCost = inputData.towerInf[magicMap.population_with_tower_id[i][1]].licit;
+					else
+						currentRentingCost = inputData.towerInf[magicMap.population_with_tower_id[i][1]].rentingCost;
 					
-					double offer = CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], rentingCost, magicMap.population_with_tower_id[i][0]);
-					double maximumRentingCost = CalculateMaximumPriceOfRent(magicMap.population_with_tower_id[i][1], distance, offer);
+					double offer = CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], currentRentingCost, magicMap.population_with_tower_id[i][0]);
+					double maximumRentingCost = CalculateMaximumPriceOfRent(magicMap.population_with_tower_id[i][0], distance, offer);
 					double ourOfferForRenting = currentRentingCost + (maximumRentingCost - currentRentingCost) *0.25;
-
+					cout << "maximumRentingCost: " << maximumRentingCost << endl;
 					if (maximumRentingCost > currentRentingCost) // skip towers which are not profitable
 					{
+						cout << "licit tower ID: " << magicMap.population_with_tower_id[i][1] << endl;
 						rentTower(magicMap.population_with_tower_id[i][1], ourOfferForRenting, distance, offer);
 						money -= ourOfferForRenting;
 					}				
@@ -195,6 +202,7 @@ void TPlayer::makeMove() {
 		}
 
 		HandleCostumerChange();
+		HandleTowerDistance();
 		playerTowers.UpdateTowerData(inputData);
         //if (inputData.header.time == 140) leaveTower(124);
     
