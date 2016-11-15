@@ -162,8 +162,10 @@ void TPlayer::makeMove() {
 					money -= rentingCost;
 					cout << "tower pop: " << magicMap.population_with_tower_id[i][0] << endl;
 				}
-				else if ( inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitID != ID ) //not our tower
+				else if ( inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner != ID 
+					   && inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitID != ID ) //not our tower
 				{
+					//worth to overlicit?
 					double currentRentingCost = inputData.towerInf[magicMap.population_with_tower_id[i][1]].licit;
 					
 					double offer = CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], rentingCost, magicMap.population_with_tower_id[i][0]);
