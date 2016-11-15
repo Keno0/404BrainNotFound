@@ -154,7 +154,7 @@ void TPlayer::makeMove() {
 			break;
 		case growth:
 
-			while (money > inputData.header.money*0.95 && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)))
+			while (money > inputData.header.money*0.90 && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)))
 			{
 				randomTowerID = i;
 				double distance = getDistanceForRent(magicMap.population_with_tower_id[randomTowerID][0]);
@@ -167,7 +167,7 @@ void TPlayer::makeMove() {
 					cout << "tower pop: " << magicMap.population_with_tower_id[randomTowerID][0] << endl;
 					inputData.towerInf[magicMap.population_with_tower_id[randomTowerID][1]].owner = ID;
 				}
-				else if (inputData.towerInf[magicMap.population_with_tower_id[randomTowerID][1]].licitID != ID  && magicMap.population_with_tower_id[randomTowerID][0]>tempPop) //not our tower
+				else if (inputData.towerInf[magicMap.population_with_tower_id[randomTowerID][1]].licitID != ID && money > inputData.header.money*0.98 &&inputData.towerInf[magicMap.population_with_tower_id[randomTowerID][1]].owner != ID && magicMap.population_with_tower_id[randomTowerID][0]>tempPop && inputData.header.time> 100) //not our tower
 				{
 					//worth to overlicit?
 					double currentRentingCost = inputData.towerInf[magicMap.population_with_tower_id[randomTowerID][1]].licit;
