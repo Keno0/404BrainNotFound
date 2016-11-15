@@ -137,9 +137,9 @@ void TPlayer::makeMove() {
 		{
 		case initState:	
 			
-			while (money > (inputData.header.money*0.95))
+			while (money > (inputData.header.money*0.95) && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)))
 			{			
-				randomTowerID = std::rand() % 20;
+				randomTowerID = magicMap.population_with_tower_id[i][1] + 1;
 				if ((inputData.towerInf[magicMap.population_with_tower_id[randomTowerID][1]].owner == 0) && magicMap.population_with_tower_id[randomTowerID][0]>tempPop)
 				{
 					rentTower(magicMap.population_with_tower_id[randomTowerID][1], rentingCost, 10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[randomTowerID][0],
@@ -147,16 +147,16 @@ void TPlayer::makeMove() {
 					money -= rentingCost;
 					inputData.towerInf[magicMap.population_with_tower_id[randomTowerID][1]].owner = ID;
 				}
-				
+				i++;
 				
 				
 			}
 			break;
 		case growth:
 
-			while (money > inputData.header.money*0.9)
+			while (money > inputData.header.money*0.95 && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)))
 			{
-				randomTowerID = std::rand() % 100;
+				randomTowerID = i;
 				double distance = getDistanceForRent(magicMap.population_with_tower_id[randomTowerID][0]);
 
 				if ((inputData.towerInf[magicMap.population_with_tower_id[randomTowerID][1]].owner == 0) && magicMap.population_with_tower_id[randomTowerID][0]>tempPop)
@@ -167,21 +167,25 @@ void TPlayer::makeMove() {
 					cout << "tower pop: " << magicMap.population_with_tower_id[randomTowerID][0] << endl;
 					inputData.towerInf[magicMap.population_with_tower_id[randomTowerID][1]].owner = ID;
 				}
-				else if ( inputData.towerInf[magicMap.population_with_tower_id[randomTowerID][1]].owner != ID
-					   && inputData.towerInf[magicMap.population_with_tower_id[randomTowerID][1]].licitID != ID  && magicMap.population_with_tower_id[randomTowerID][0]>tempPop) //not our tower
+				else if (inputData.towerInf[magicMap.population_with_tower_id[randomTowerID][1]].licitID != ID  && magicMap.population_with_tower_id[randomTowerID][0]>tempPop) //not our tower
 				{
 					//worth to overlicit?
 					double currentRentingCost = inputData.towerInf[magicMap.population_with_tower_id[randomTowerID][1]].licit;
+					if (currentRentingCost < 7)
+					{
+						currentRentingCost = inputData.towerInf[magicMap.population_with_tower_id[randomTowerID][1]].rentingCost;
+					}
 					
 					double offer = CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[randomTowerID][0], rentingCost, magicMap.population_with_tower_id[randomTowerID][0]);
-					double maximumRentingCost = CalculateMaximumPriceOfRent(magicMap.population_with_tower_id[randomTowerID][1], distance, offer);
-					double ourOfferForRenting = currentRentingCost + (maximumRentingCost - currentRentingCost) *0.25;
+					double maximumRentingCost = 100;/*CalculateMaximumPriceOfRent(magicMap.population_with_tower_id[randomTowerID][1], distance, offer);*/
+					double ourOfferForRenting = currentRentingCost + 1;
 
-					if (maximumRentingCost > currentRentingCost) // skip towers which are not profitable
+					cout << "ourOfferForRenting" << ourOfferForRenting << endl;
+					if (200 > currentRentingCost) // skip towers which are not profitable
 					{
+						cout << "licit, tower ID: " << magicMap.population_with_tower_id[randomTowerID][1] << endl;
 						rentTower(magicMap.population_with_tower_id[randomTowerID][1], ourOfferForRenting, distance, offer);
-						inputData.towerInf[magicMap.population_with_tower_id[randomTowerID][1]].licitID = ID;
-						money -= ourOfferForRenting;
+						money -= ourOfferForRenting*3;
 					}				
 				}
 				i++;
