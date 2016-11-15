@@ -425,12 +425,6 @@ public:
 		
 		for (int i = 0; i < playerTowers.actualPosition; i++)
 		{
-			if(inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust < 100000)
-			{ 
-				changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
-					40);
-			}
-			else
 			{
 				if ((playerTowers.playerTowerIndexes[i][3] - inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust) > CUSTOMER_CHANGES)
 				{
@@ -442,7 +436,7 @@ public:
 					}
 					else
 						changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
-							inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.9);
+							inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.7);
 				}
 
 				else if ((inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust - playerTowers.playerTowerIndexes[i][3]) > CUSTOMER_CHANGES)
@@ -525,7 +519,7 @@ public:
 				else
 					currentRentingCost = inputData.towerInf[magicMap.population_with_tower_id[i][1]].rentingCost + 1;
 
-				double offer = CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], currentRentingCost, magicMap.population_with_tower_id[i][0]);
+				double offer = CalculateOffer(10 + DISTRICT_SIZE*0.00000015* magicMap.population_with_tower_id[i][0], currentRentingCost, magicMap.population_with_tower_id[i][0]);
 				double maximumRentingCost = CalculateMaximumPriceOfRent(magicMap.population_with_tower_id[i][0], distance, offer);
 				if (maximumRentingCost > currentRentingCost) // skip towers which are not profitable
 				{

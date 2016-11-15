@@ -136,7 +136,7 @@ void TPlayer::makeMove() {
 				if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0) && magicMap.population_with_tower_id[i][0]>DEFAULT_POPULATION)
 				{
 					rentTower(magicMap.population_with_tower_id[i][1], DEFAULT_RENTING_COST, 10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0],
-						CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], DEFAULT_RENTING_COST, magicMap.population_with_tower_id[i][0]));
+						CalculateOffer(10 + DISTRICT_SIZE*0.00000015* magicMap.population_with_tower_id[i][0], DEFAULT_RENTING_COST, magicMap.population_with_tower_id[i][0]));
 					money -= DEFAULT_RENTING_COST;
 				}
 				i++;
