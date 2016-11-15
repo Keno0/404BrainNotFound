@@ -480,7 +480,7 @@ public:
 		int i = 0;
 		int distance = 0;
 		int currentRentingCost = 0;
-		while (money > inputData.header.money*0.95 && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)))
+		while (money > inputData.header.money*0.95 && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)) && inputData.header.money > 4000)
 		{
 			randomTower = magicMap.population_with_tower_id[i][1] + 1;
 			distance = getDistanceForRent(magicMap.population_with_tower_id[i][0]);
