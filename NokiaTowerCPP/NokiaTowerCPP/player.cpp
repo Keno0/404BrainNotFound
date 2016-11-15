@@ -85,16 +85,11 @@ States determinateCurrentState(TinputData inputData, MoneyBuffer moneyBuffer)
 	return state;
 }
 
-double CalculateOffer(int distance,int rentingCost, int disctrictCustomer)
-{
-	return ((1 + PLAN_PROFIT)*(distance*distance*0.04 + rentingCost) / (disctrictCustomer*PROFIT_PER_CUSTOMER*PREDICT_OF_CUSTUMER_OF_A_TOWER));
-}
 
 
 
-double getDistanceForRent(int population) {
-	return 10 + DISTRICT_SIZE*0.000001* population;
-}
+
+
 
 void TPlayer::makeMove() {
 
@@ -113,11 +108,8 @@ void TPlayer::makeMove() {
 	state=determinateCurrentState(inputData, playerMoneyBuffer);
 
 	AddTowersIfItsOur();
-	
-
-	int tempPop = 150000;
-	int money = inputData.header.money;
-	int rentingCost = 7;
+	money = inputData.header.money;
+ 
 	int i = 0;
 	double currentRentingCost = 0;
 	double distance = 0;
@@ -141,11 +133,11 @@ void TPlayer::makeMove() {
 			while ((money > (inputData.header.money*0.95)) && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)))
 			{			
 
-				if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0) && magicMap.population_with_tower_id[i][0]>tempPop)
+				if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0) && magicMap.population_with_tower_id[i][0]>DEFAULT_POPULATION)
 				{
-					rentTower(magicMap.population_with_tower_id[i][1], rentingCost, 10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0],
-						CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0],rentingCost, magicMap.population_with_tower_id[i][0]));
-					money -= rentingCost;
+					rentTower(magicMap.population_with_tower_id[i][1], DEFAULT_RENTING_COST, 10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0],
+						CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], DEFAULT_RENTING_COST, magicMap.population_with_tower_id[i][0]));
+					money -= DEFAULT_RENTING_COST;
 				}
 				i++;
 				
@@ -153,43 +145,8 @@ void TPlayer::makeMove() {
 			break;
 		case growth:
 
-			while (money > inputData.header.money*0.9 && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)))
-			{
-				distance = getDistanceForRent(magicMap.population_with_tower_id[i][0]);
-				// rent free towers
-				if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0) && magicMap.population_with_tower_id[i][0]>tempPop)
-				{
-					rentTower(magicMap.population_with_tower_id[i][1], rentingCost, distance,
-						CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], rentingCost, magicMap.population_with_tower_id[i][0]));
-					money -= rentingCost;
-					cout << "tower pop: " << magicMap.population_with_tower_id[i][0] << endl;
-				}
-				//licit to another player's tower
-				else if ( inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner != ID 
-					   && inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitID != ID  && magicMap.population_with_tower_id[i][0]>tempPop) //not our tower
-				{
-					//worth to overlicit?
-					if (inputData.towerInf[magicMap.population_with_tower_id[i][1]].licit > 0)
-						currentRentingCost = inputData.towerInf[magicMap.population_with_tower_id[i][1]].licit;
-					else
-						currentRentingCost = inputData.towerInf[magicMap.population_with_tower_id[i][1]].rentingCost;
-					
-					double offer = CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], currentRentingCost, magicMap.population_with_tower_id[i][0]);
-					double maximumRentingCost = CalculateMaximumPriceOfRent(magicMap.population_with_tower_id[i][0], distance, offer);
-					double ourOfferForRenting = currentRentingCost + (maximumRentingCost - currentRentingCost) *0.25;
-					cout << "maximumRentingCost: " << maximumRentingCost << endl;
-					if (maximumRentingCost > currentRentingCost) // skip towers which are not profitable
-					{
-						cout << "licit tower ID: " << magicMap.population_with_tower_id[i][1] << endl;
-						rentTower(magicMap.population_with_tower_id[i][1], ourOfferForRenting, distance, offer);
-						money -= ourOfferForRenting;
-					}				
-				}
-				i++;
-			}
+			GrowthStateLevel1();
 
-			if(inputData.towerInf[playerTowers.playerTowerIndexes[playerTowers.actualPosition][0]].techLevel < 5)
-				outputData.invest = playerMoneyBuffer.AvarageOfLastFiveMonth()*0.15;
 			break;
 		case stagnation:
 			if (inputData.towerInf[playerTowers.playerTowerIndexes[playerTowers.actualPosition][0]].techLevel < 5)
