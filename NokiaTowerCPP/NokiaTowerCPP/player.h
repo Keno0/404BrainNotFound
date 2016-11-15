@@ -480,7 +480,7 @@ public:
 		int i = 0;
 		int distance = 0;
 		int currentRentingCost = 0;
-		while (money > inputData.header.money*0.95 && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)) && inputData.header.money > 4000)
+		while (money > inputData.header.money*0.95 && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)) && inputData.header.money > 10000)
 		{
 			randomTower = magicMap.population_with_tower_id[i][1] + 1;
 			distance = getDistanceForRent(magicMap.population_with_tower_id[i][0]);
@@ -488,7 +488,7 @@ public:
 			if ((inputData.towerInf[randomTower].owner == 0) && magicMap.population_with_tower_id[i][0]>DEFAULT_POPULATION)
 			{
 				rentTower(randomTower, DEFAULT_RENTING_COST, distance,
-					CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], DEFAULT_RENTING_COST, magicMap.population_with_tower_id[i][0]));
+					CalculateOffer(10 + DISTRICT_SIZE*0.00000015* magicMap.population_with_tower_id[i][0], DEFAULT_RENTING_COST, magicMap.population_with_tower_id[i][0]));
 				money -= DEFAULT_RENTING_COST;
 				cout << "tower pop: " << magicMap.population_with_tower_id[i][0] << endl;
 			}
