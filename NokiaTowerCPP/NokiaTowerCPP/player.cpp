@@ -175,6 +175,7 @@ void TPlayer::makeMove() {
 					if (maximumRentingCost > currentRentingCost) // skip towers which are not profitable
 					{
 						rentTower(magicMap.population_with_tower_id[i][1], ourOfferForRenting, distance, offer);
+						money -= ourOfferForRenting;
 					}				
 				}
 				i++;
