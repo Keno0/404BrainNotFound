@@ -424,6 +424,7 @@ public:
 		
 		for (int i = 0; i < playerTowers.actualPosition; i++)
 		{
+
 			if ((playerTowers.playerTowerIndexes[i][3] - inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust) > CUSTOMER_CHANGES)
 			{
 				int tempOffer = PalyerCalculateMinimumOffer(playerTowers.playerTowerIndexes[i][0]);
@@ -441,6 +442,11 @@ public:
 			{
 				changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
 					inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*1.1);
+			}
+			if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust < 100000)
+			{
+				changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
+					40);
 			}
 		}
 	}
