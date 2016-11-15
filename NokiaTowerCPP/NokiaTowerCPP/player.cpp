@@ -90,6 +90,15 @@ double CalculateOffer(int distance,int rentingCost, int disctrictCustomer)
 	return ((1 + PLAN_PROFIT)*(distance*distance*0.04 + rentingCost) / (disctrictCustomer*PROFIT_PER_CUSTOMER*PREDICT_OF_CUSTUMER_OF_A_TOWER));
 }
 
+double CalculateMaximumPriceOfRent(int customer, double distance, double offer){
+	
+	return 400;
+}
+
+double getDistanceForRent(int population) {
+	return 10 + DISTRICT_SIZE*0.000001* population;
+}
+
 void TPlayer::makeMove() {
 
 	int maxPopLocationX = 0;
@@ -147,13 +156,30 @@ void TPlayer::makeMove() {
 
 			while (money > inputData.header.money*0.9 && magicMap.population_with_tower_id[i][0]>tempPop)
 			{
+				double distance = getDistanceForRent(magicMap.population_with_tower_id[i][0]);
 
 				if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0))
 				{
-					rentTower(magicMap.population_with_tower_id[i][1], rentingCost, 10 + DISTRICT_SIZE*0.000001* magicMap.population_with_tower_id[i][0], 
+					rentTower(magicMap.population_with_tower_id[i][1], rentingCost, distance,
 						CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], rentingCost, magicMap.population_with_tower_id[i][0]));
 					money -= rentingCost;
 					cout << "tower pop: " << magicMap.population_with_tower_id[i][0] << endl;
+				}
+				else if ( inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitID != ID ) //not our tower
+				{
+					double currentRentingCost = inputData.towerInf[magicMap.population_with_tower_id[i][1]].rentingCost;
+					
+					double offer = CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], rentingCost, magicMap.population_with_tower_id[i][0]);
+					double maximumRentingCost = CalculateMaximumPriceOfRent(magicMap.population_with_tower_id[i][1], distance, offer);
+					double ourOfferForRenting = currentRentingCost + (maximumRentingCost - currentRentingCost) *0.25;
+
+					if (maximumRentingCost > currentRentingCost) // skip towers which are not profitable
+					{
+						rentTower(magicMap.population_with_tower_id[i][1], ourOfferForRenting, distance, offer);
+					}
+						
+
+					
 				}
 				i++;
 			}
