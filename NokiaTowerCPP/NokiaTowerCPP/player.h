@@ -447,6 +447,14 @@ public:
 		return ((inputData.towerInf[towerID].rentingCost + inputData.towerInf[towerID].runningCost) / (inputData.towerInf[towerID].cust *PROFIT_PER_CUSTOMER));
 	}
 
+	double CalculateMaximumPriceOfRent(int customer, double distance, double offer) {
+
+		double income = customer*PROFIT_PER_CUSTOMER*PREDICT_OF_CUSTUMER_OF_A_TOWER*offer;
+		double runnungCost = distance*distance*0.04;
+
+		return income - runnungCost;			
+	}
+
 protected:
     void rentTower(short ID, float rentingCost, short dist, float offer)
     {
