@@ -427,14 +427,14 @@ public:
 			if(inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust < 100000)
 			{ 
 				changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
-					30);
+					40);
 			}
 			else
 			{
 				if ((playerTowers.playerTowerIndexes[i][3] - inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust) > CUSTOMER_CHANGES)
 				{
 					int tempOffer = PalyerCalculateMinimumOffer(playerTowers.playerTowerIndexes[i][0]);
-					if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.9 < tempOffer)
+					if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.8 < tempOffer)
 					{
 						changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
 							tempOffer);
@@ -481,11 +481,11 @@ public:
 		int i = 0;
 		int distance = 0;
 		int currentRentingCost = 0;
-		while (money > inputData.header.money*0.9 && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)))
+		while (money > inputData.header.money*0.95 && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)) )
 		{
 			distance = getDistanceForRent(magicMap.population_with_tower_id[i][0]);
 			// rent free towers
-			if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0) && magicMap.population_with_tower_id[i][0]>DEFAULT_POPULATION)
+			if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0) && magicMap.population_with_tower_id[i][0]>DEFAULT_POPULATION && inputData.header.time % 5 == 0)
 			{
 				rentTower(magicMap.population_with_tower_id[i][1], DEFAULT_RENTING_COST, distance,
 					CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], DEFAULT_RENTING_COST, magicMap.population_with_tower_id[i][0]));
@@ -494,7 +494,8 @@ public:
 			}
 			//licit to another player's tower
 			else if (inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner != ID
-				&& inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitID != ID  && magicMap.population_with_tower_id[i][0]>DEFAULT_POPULATION && money > inputData.header.money*0.95) //not our tower
+				&& inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitID != ID  && 
+				magicMap.population_with_tower_id[i][0]>DEFAULT_POPULATION && money > inputData.header.money*0.95 && inputData.header.time >100 ) //not our tower
 			{
 				//worth to overlicit?
 				if (inputData.towerInf[magicMap.population_with_tower_id[i][1]].licit > 0)
