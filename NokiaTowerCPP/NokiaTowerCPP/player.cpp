@@ -138,22 +138,28 @@ void TPlayer::makeMove() {
 			
 			while (money > (inputData.header.money*0.95) && magicMap.population_with_tower_id[i][0]>tempPop)
 			{			
-
+				/* for testing */
+				rentingCost = std::rand() % 20 + 8;
+				/* for testing */
 				if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0))
 				{
 					rentTower(magicMap.population_with_tower_id[i][1], rentingCost, 10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0],
 						CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0],rentingCost, magicMap.population_with_tower_id[i][0]));
 					money -= rentingCost;
+					cout << ID << " player offer for : " << magicMap.population_with_tower_id[i][1] << "is " << rentingCost << endl;
 				}
 				i++;
 				
 			}
 			break;
 		case growth:
-
 			while (money > inputData.header.money*0.9 && magicMap.population_with_tower_id[i][0]>tempPop)
 			{
 				double distance = getDistanceForRent(magicMap.population_with_tower_id[i][0]);
+				/* for testing */
+				rentingCost = std::rand() % 29 + 7;
+				cout << "rentingCost: " << rentingCost << endl;
+				/* for testing */
 
 				if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0))
 				{
@@ -164,12 +170,16 @@ void TPlayer::makeMove() {
 				}
 				else if ( inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitID != ID ) //not our tower
 				{
-					double currentRentingCost = inputData.towerInf[magicMap.population_with_tower_id[i][1]].licit;
+					double currentRentingCost = inputData.towerInf[magicMap.population_with_tower_id[i][1]].rentingCost;
 					
 					double offer = CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], rentingCost, magicMap.population_with_tower_id[i][0]);
 					double maximumRentingCost = CalculateMaximumPriceOfRent(magicMap.population_with_tower_id[i][1], distance, offer);
 					double ourOfferForRenting = currentRentingCost + (maximumRentingCost - currentRentingCost) *0.25;
 
+					cout << "TORONY TÁMADÁS: " << magicMap.population_with_tower_id[i][1] << endl << endl;
+					cout << "maxRentCost: " << maximumRentingCost << endl;
+
+					cout << "currentRentingCost: " << currentRentingCost << endl;
 					if (maximumRentingCost > currentRentingCost) // skip towers which are not profitable
 					{
 						rentTower(magicMap.population_with_tower_id[i][1], ourOfferForRenting, distance, offer);
@@ -186,6 +196,7 @@ void TPlayer::makeMove() {
 				outputData.invest = playerMoneyBuffer.AvarageOfLastFiveMonth()*0.05;
 			break;
 		case decrease:
+			cout << "BRÉKÓBRÉKÓ" << endl;
 			break;
 		default:
 			break;

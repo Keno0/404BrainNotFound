@@ -452,7 +452,7 @@ public:
 		double income = customer*PROFIT_PER_CUSTOMER*PREDICT_OF_CUSTUMER_OF_A_TOWER*offer;
 		double runnungCost = distance*distance*0.04;
 
-		return income - runnungCost;			
+		return -(income - runnungCost);			
 	}
 
 protected:
