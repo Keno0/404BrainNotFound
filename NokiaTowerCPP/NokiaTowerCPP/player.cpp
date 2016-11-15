@@ -136,10 +136,10 @@ void TPlayer::makeMove() {
 		{
 		case initState:	
 			
-			while (money > (inputData.header.money*0.95) && magicMap.population_with_tower_id[i][0]>tempPop)
+			while (money > (inputData.header.money*0.95))
 			{			
 
-				if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0))
+				if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0) && magicMap.population_with_tower_id[i][0]>tempPop)
 				{
 					rentTower(magicMap.population_with_tower_id[i][1], rentingCost, 10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0],
 						CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0],rentingCost, magicMap.population_with_tower_id[i][0]));
@@ -151,11 +151,11 @@ void TPlayer::makeMove() {
 			break;
 		case growth:
 
-			while (money > inputData.header.money*0.9 && magicMap.population_with_tower_id[i][0]>tempPop)
+			while (money > inputData.header.money*0.9)
 			{
 				double distance = getDistanceForRent(magicMap.population_with_tower_id[i][0]);
 
-				if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0))
+				if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0) && magicMap.population_with_tower_id[i][0]>tempPop)
 				{
 					rentTower(magicMap.population_with_tower_id[i][1], rentingCost, distance,
 						CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], rentingCost, magicMap.population_with_tower_id[i][0]));
@@ -163,7 +163,7 @@ void TPlayer::makeMove() {
 					cout << "tower pop: " << magicMap.population_with_tower_id[i][0] << endl;
 				}
 				else if ( inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner != ID 
-					   && inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitID != ID ) //not our tower
+					   && inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitID != ID  && magicMap.population_with_tower_id[i][0]>tempPop) //not our tower
 				{
 					//worth to overlicit?
 					double currentRentingCost = inputData.towerInf[magicMap.population_with_tower_id[i][1]].licit;
