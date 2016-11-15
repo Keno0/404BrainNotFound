@@ -136,7 +136,7 @@ void TPlayer::makeMove() {
 		{
 		case initState:	
 			
-			while (money > (inputData.header.money*0.95))
+			while ((money > (inputData.header.money*0.95)) && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)))
 			{			
 
 				if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0) && magicMap.population_with_tower_id[i][0]>tempPop)
@@ -151,7 +151,7 @@ void TPlayer::makeMove() {
 			break;
 		case growth:
 
-			while (money > inputData.header.money*0.9)
+			while (money > inputData.header.money*0.9 && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)))
 			{
 				double distance = getDistanceForRent(magicMap.population_with_tower_id[i][0]);
 
