@@ -129,7 +129,7 @@ void TPlayer::makeMove() {
 		switch (state)
 		{
 		case initState:	
-			
+			i = 0;
 			while ((money > (inputData.header.money*0.95)) && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)))
 			{			
 
@@ -149,6 +149,28 @@ void TPlayer::makeMove() {
 
 			break;
 		case stagnation:
+			i = 0;
+			while (money > inputData.header.money*0.95 && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)) && inputData.header.money > SAFETY_MONEY)
+			{
+				if (inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == ID
+					&& inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitID != 0
+					&& inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitDelay < 3)
+				{
+					if (inputData.towerInf[magicMap.population_with_tower_id[i][1]].licit > 0)
+						currentRentingCost = inputData.towerInf[magicMap.population_with_tower_id[i][1]].licit + 1;
+					else
+						currentRentingCost = inputData.towerInf[magicMap.population_with_tower_id[i][1]].rentingCost + 1;
+
+					double offer = CalculateOffer(10 + DISTRICT_SIZE*0.00000015* magicMap.population_with_tower_id[i][0], currentRentingCost, magicMap.population_with_tower_id[i][0]);
+					double maximumRentingCost = CalculateMaximumPriceOfRent(magicMap.population_with_tower_id[i][0], distance, offer);
+					if (maximumRentingCost > currentRentingCost) // skip towers which are not profitable
+					{
+						rentTower(magicMap.population_with_tower_id[i][1], currentRentingCost, distance, offer);
+						money -= currentRentingCost;
+					}
+				}
+				i++;
+			}
 			if (inputData.towerInf[playerTowers.playerTowerIndexes[playerTowers.actualPosition][0]].techLevel < 5)
 				outputData.invest = playerMoneyBuffer.AvarageOfLastFiveMonth()*0.05;
 			break;

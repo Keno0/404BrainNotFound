@@ -21,6 +21,7 @@
 #define SAFETY_MONEY 5000
 #define MAX_CUSTOMER_AT_A_TOWER 500000
 #define MIN_CUSTOMER_AT_A_TOWER 20000
+#define AVERAGE_POPULATION_GROWTH 1.00015
 using namespace std;
 
 class PlayerTowers
@@ -334,6 +335,13 @@ public:
 			cout << "DEBUG END" << endl;
 		}
 
+	}
+
+	void MagicMap::simulatePopulationChange() {
+		for (int i = 1; i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE); i++)
+		{
+			population_with_tower_id[i][0] = population_with_tower_id[i][0] * AVERAGE_POPULATION_GROWTH;
+		}
 	}
 
 };
