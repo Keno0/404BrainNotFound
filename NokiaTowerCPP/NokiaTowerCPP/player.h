@@ -323,19 +323,6 @@ public:
 
 		/* reverse the array - biggest population first */
 		std::reverse(std::begin(population_with_tower_id), std::end(population_with_tower_id));
-		if (debug) {
-			cout << "DEBUG" << endl << endl << endl;
-			cout << "population" << endl;
-			cout << population_with_tower_id[0][0] << endl;
-			cout << population_with_tower_id[1][0] << endl;
-			cout << population_with_tower_id[2][0] << endl;
-			cout << population_with_tower_id[3][0] << endl;
-			cout << population_with_tower_id[4][0] << endl;
-			cout << population_with_tower_id[5][0] << endl;
-			cout << population_with_tower_id[6][0] << endl;
-			cout << "DEBUG END" << endl;
-		}
-
 	}
 
 	void MagicMap::simulatePopulationChange() {
@@ -357,7 +344,6 @@ public:
 
 	MoneyBuffer playerMoneyBuffer;
 	PlayerTowers playerTowers;
-
 
     Map *map = nullptr;
 
@@ -438,40 +424,47 @@ public:
 		{
 			tempOffer = PalyerCalculateMinimumOffer(playerTowers.playerTowerIndexes[i][0]);
 			
-				if ((playerTowers.playerTowerIndexes[i][3] - inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust) > CUSTOMER_CHANGES)
-				{
+			if ((playerTowers.playerTowerIndexes[i][3] - inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust) > CUSTOMER_CHANGES)
+			{
 					
-					if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.8 < tempOffer)
-					{
-						changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
-							tempOffer);
-					}
-					else
-						changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
-							inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.9);
+				if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.8 < tempOffer)
+				{
+					changeDistanceAndOffer(	playerTowers.playerTowerIndexes[i][0],
+											inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
+											tempOffer);
 				}
+				else
+				{
+					changeDistanceAndOffer(	playerTowers.playerTowerIndexes[i][0],
+											inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
+											inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.9);
+				}
+			}
 
-				else if ((inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust - playerTowers.playerTowerIndexes[i][3]) > CUSTOMER_CHANGES)
-				{
-					changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
-						inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*1.1);
-				}
-				else if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust > MAX_CUSTOMER_AT_A_TOWER)
-				{
-					changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
-						inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*1.1);
-				}
-				else if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust < MIN_CUSTOMER_AT_A_TOWER && inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust > 0)
-				{
-					changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
-						inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.9);
-				}
-				else if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust == 0)
-				{
-					changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
-						1);
-				}
-			
+			else if ((inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust - playerTowers.playerTowerIndexes[i][3]) > CUSTOMER_CHANGES)
+			{
+				changeDistanceAndOffer(	playerTowers.playerTowerIndexes[i][0],
+										inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
+										inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*1.1);
+			}
+			else if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust > MAX_CUSTOMER_AT_A_TOWER)
+			{
+				changeDistanceAndOffer(	playerTowers.playerTowerIndexes[i][0],
+										inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
+										inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*1.1);
+			}
+			else if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust < MIN_CUSTOMER_AT_A_TOWER && inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust > 0)
+			{
+				changeDistanceAndOffer(	playerTowers.playerTowerIndexes[i][0],
+										inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
+										inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.9);
+			}
+			else if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust == 0)
+			{
+				changeDistanceAndOffer(	playerTowers.playerTowerIndexes[i][0],
+										inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
+										1);
+			}			
 		}
 	}
 
@@ -480,8 +473,9 @@ public:
 		for (int i = 0; i < playerTowers.actualPosition; i++)
 		{
 			if(inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance < 15)
-				changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], 15,
-					inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer);
+				changeDistanceAndOffer(	playerTowers.playerTowerIndexes[i][0],
+										15,
+										inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer);
 		}
 	}
 
@@ -520,9 +514,10 @@ public:
 				maxTowerBuy++;
 			}
 			//licit to another player's tower
-			else if (inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner != ID
-				&& inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitID != ID  && 
-				magicMap.population_with_tower_id[i][0]>DEFAULT_POPULATION && money > inputData.header.money*0.95 && inputData.header.time >100 && maxTowerLicit <= MAX_TOWER_BUY) //not our tower
+			else if (inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner != ID &&
+				inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitID != ID && 
+				magicMap.population_with_tower_id[i][0]>DEFAULT_POPULATION && money > inputData.header.money*0.95 &&
+				inputData.header.time >100 && maxTowerLicit <= MAX_TOWER_BUY) //not our tower
 			{
 				//worth to overlicit?
 				if (inputData.towerInf[magicMap.population_with_tower_id[i][1]].licit > 0)
@@ -533,30 +528,37 @@ public:
 				double offer = CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], currentRentingCost, magicMap.population_with_tower_id[i][0]);
 				double maximumRentingCost = CalculateMaximumPriceOfRent(magicMap.population_with_tower_id[i][0], distance, offer);
 				double ourOfferForRenting = currentRentingCost + (maximumRentingCost - currentRentingCost) *0.25;
-				cout << "maximumRentingCost: " << maximumRentingCost << endl;
+				//cout << "maximumRentingCost: " << maximumRentingCost << endl;
 				if (maximumRentingCost > ourOfferForRenting) // skip towers which are not profitable
 				{
-					cout << "licit tower ID: " << magicMap.population_with_tower_id[i][1] << endl;
+					//cout << "licit tower ID: " << magicMap.population_with_tower_id[i][1] << endl;
 					rentTower(magicMap.population_with_tower_id[i][1], ourOfferForRenting, distance, offer);
 					money -= ourOfferForRenting;
 					maxTowerLicit++;
 				}
 			}
 			// ha esetleg a mi tornyainkat licitálják
-			else if (inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == ID
-				&& inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitID != 0
-				&& inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitDelay < 3)
+			else if (inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == ID &&
+				inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitID != 0 &&
+				inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitDelay < 3)
 			{
 				if (inputData.towerInf[magicMap.population_with_tower_id[i][1]].licit > 0)
 					currentRentingCost = inputData.towerInf[magicMap.population_with_tower_id[i][1]].licit+1;
 				else
 					currentRentingCost = inputData.towerInf[magicMap.population_with_tower_id[i][1]].rentingCost + 1;
 
-				double offer = CalculateOffer(10 + DISTRICT_SIZE*0.00000015* magicMap.population_with_tower_id[i][0], currentRentingCost, magicMap.population_with_tower_id[i][0]);
-				double maximumRentingCost = CalculateMaximumPriceOfRent(magicMap.population_with_tower_id[i][0], distance, offer);
+				double offer = CalculateOffer(	10 + DISTRICT_SIZE*0.00000015* magicMap.population_with_tower_id[i][0],
+												currentRentingCost, magicMap.population_with_tower_id[i][0]);
+
+				double maximumRentingCost = CalculateMaximumPriceOfRent(magicMap.population_with_tower_id[i][0],
+																		distance,
+																		offer);
 				if (maximumRentingCost > currentRentingCost) // skip towers which are not profitable
 				{
-					rentTower(magicMap.population_with_tower_id[i][1], currentRentingCost, distance, offer);
+					rentTower(	magicMap.population_with_tower_id[i][1],
+								currentRentingCost,
+								distance,
+								offer);
 					money -= currentRentingCost;
 				}
 			}
