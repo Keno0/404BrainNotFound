@@ -22,6 +22,7 @@
 #define MAX_CUSTOMER_AT_A_TOWER 500000
 #define MIN_CUSTOMER_AT_A_TOWER 20000
 #define AVERAGE_POPULATION_GROWTH 1.00015
+#define MAX_TOWER_BUY 3
 using namespace std;
 
 class PlayerTowers
@@ -447,7 +448,7 @@ public:
 					}
 					else
 						changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
-							inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.7);
+							inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.9);
 				}
 
 				else if ((inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust - playerTowers.playerTowerIndexes[i][3]) > CUSTOMER_CHANGES)
@@ -460,10 +461,15 @@ public:
 					changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
 						inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*1.1);
 				}
-				else if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust < MIN_CUSTOMER_AT_A_TOWER)
+				else if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust < MIN_CUSTOMER_AT_A_TOWER && inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust > 0)
 				{
 					changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
-						tempOffer*0.5);
+						inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.9);
+				}
+				else if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust == 0)
+				{
+					changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
+						1);
 				}
 			
 		}
@@ -499,22 +505,24 @@ public:
 	{
 		int i = 0;
 		int distance = 0;
+		int maxTowerBuy = 0, maxTowerLicit=0;
 		int currentRentingCost = 0;
 		while (money > inputData.header.money*0.95 && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)) && inputData.header.money > SAFETY_MONEY)
 		{
 			distance = getDistanceForRent(magicMap.population_with_tower_id[i][0]);
 			// rent free towers
-			if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0) && magicMap.population_with_tower_id[i][0]>DEFAULT_POPULATION && inputData.header.time % 5 == 0)
+			if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0) && magicMap.population_with_tower_id[i][0]>DEFAULT_POPULATION && inputData.header.time % 5 == 0 && maxTowerBuy <= MAX_TOWER_BUY)
 			{
 				rentTower(magicMap.population_with_tower_id[i][1], DEFAULT_RENTING_COST, distance,
 					CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], DEFAULT_RENTING_COST, magicMap.population_with_tower_id[i][0]));
 				money -= DEFAULT_RENTING_COST;
 				cout << "tower pop: " << magicMap.population_with_tower_id[i][0] << endl;
+				maxTowerBuy++;
 			}
 			//licit to another player's tower
 			else if (inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner != ID
 				&& inputData.towerInf[magicMap.population_with_tower_id[i][1]].licitID != ID  && 
-				magicMap.population_with_tower_id[i][0]>DEFAULT_POPULATION && money > inputData.header.money*0.95 && inputData.header.time >100 ) //not our tower
+				magicMap.population_with_tower_id[i][0]>DEFAULT_POPULATION && money > inputData.header.money*0.95 && inputData.header.time >100 && maxTowerLicit <= MAX_TOWER_BUY) //not our tower
 			{
 				//worth to overlicit?
 				if (inputData.towerInf[magicMap.population_with_tower_id[i][1]].licit > 0)
@@ -531,6 +539,7 @@ public:
 					cout << "licit tower ID: " << magicMap.population_with_tower_id[i][1] << endl;
 					rentTower(magicMap.population_with_tower_id[i][1], ourOfferForRenting, distance, offer);
 					money -= ourOfferForRenting;
+					maxTowerLicit++;
 				}
 			}
 			// ha esetleg a mi tornyainkat licitálják
