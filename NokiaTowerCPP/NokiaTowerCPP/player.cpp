@@ -107,6 +107,15 @@ void TPlayer::makeMove() {
 	double currentRentingCost = 0;
 	double distance = 0;
 
+	//for (int i = 0; i < playerTowers.actualPositionOfBlackList; i++)
+	//{
+	//	if (playerTowers.playerBlackListTower[i][1] == 1)
+	//	{
+	//		leaveTower(playerTowers.playerBlackListTower[i][0]);
+	//		playerTowers.playerBlackListTower[i][1] = 0;
+	//	}
+	//}
+
 	state = determinateCurrentState(inputData, playerMoneyBuffer);	//ezt a kettot nem kéne felcserelni?
 	playerMoneyBuffer.Add(inputData.header.money);					//???
 	switch (state)
