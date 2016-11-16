@@ -19,6 +19,8 @@
 #define DEFAULT_RENTING_COST 7
 #define DEFAULT_POPULATION 150000 // ez alatti district population-nél nem veszünk tornyot
 #define SAFETY_MONEY 5000
+#define MAX_CUSTOMER_AT_A_TOWER 500000
+#define MIN_CUSTOMER_AT_A_TOWER 20000
 using namespace std;
 
 class PlayerTowers
@@ -422,13 +424,14 @@ public:
 	//[i][0]: tower index, [i][1]: max costumer, [i][2]:maxprofit, [i][3]: current customer, [i][4]: current profit
 	void HandleCostumerChange()
 	{
-		
+		int tempOffer = 1;
 		for (int i = 0; i < playerTowers.actualPosition; i++)
 		{
-			{
+			tempOffer = PalyerCalculateMinimumOffer(playerTowers.playerTowerIndexes[i][0]);
+			
 				if ((playerTowers.playerTowerIndexes[i][3] - inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust) > CUSTOMER_CHANGES)
 				{
-					int tempOffer = PalyerCalculateMinimumOffer(playerTowers.playerTowerIndexes[i][0]);
+					
 					if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.8 < tempOffer)
 					{
 						changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
@@ -444,7 +447,17 @@ public:
 					changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
 						inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*1.1);
 				}
-			}
+				else if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust > MAX_CUSTOMER_AT_A_TOWER)
+				{
+					changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
+						inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*1.1);
+				}
+				else if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust < MIN_CUSTOMER_AT_A_TOWER)
+				{
+					changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0], inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
+						tempOffer*0.5);
+				}
+			
 		}
 	}
 
@@ -460,7 +473,10 @@ public:
 
 	double PalyerCalculateMinimumOffer(int towerID)
 	{
-		return ((inputData.towerInf[towerID].rentingCost + inputData.towerInf[towerID].runningCost) / (inputData.towerInf[towerID].cust *PROFIT_PER_CUSTOMER));
+		if (inputData.towerInf[towerID].cust > 0)
+			return ((inputData.towerInf[towerID].rentingCost + inputData.towerInf[towerID].runningCost) / (inputData.towerInf[towerID].cust *PROFIT_PER_CUSTOMER));
+		else
+			return 5;
 	}
 
 	double CalculateMaximumPriceOfRent(int customer, double distance, double offer) {
