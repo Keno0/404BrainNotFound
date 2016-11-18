@@ -23,6 +23,7 @@
 #define MIN_CUSTOMER_AT_A_TOWER 20000
 #define AVERAGE_POPULATION_GROWTH 1.00015
 #define MAX_TOWER_BUY 3
+#define MAX_TOWER_BUY_IN_INIT_STATE 5
 using namespace std;
 
 class PlayerTowers
@@ -277,7 +278,7 @@ public:
 	void MagicMap::giveMeMyTowerPopulation() {
 		int bigmap_district_center_x = 0;
 		int bigmap_district_center_y = 0;
-		int tower_ID = 0;
+		
 
 
 		/* get tower ID for all districts */
@@ -287,8 +288,9 @@ public:
 			{
 				bigmap_district_center_x = (DISTRICT_SIZE / 2) + (DISTRICT_SIZE * magic_x);
 				bigmap_district_center_y = (DISTRICT_SIZE / 2) + (DISTRICT_SIZE * magic_y);
-				double min_distance = 10000;
+				double min_distance = 1000;
 
+				int tower_ID = -1;
 				/* get nearest tower to district center */
 				for (int i = 0; i < TOWER_MAX; i++)
 				{
@@ -299,8 +301,16 @@ public:
 					}
 				}
 
-				population_with_tower_id[magic_x * (MAP_SIZE / DISTRICT_SIZE) + magic_y][0] = magicMap[magic_x][magic_y]; // population in district
-				population_with_tower_id[magic_x * (MAP_SIZE / DISTRICT_SIZE) + magic_y][1] = tower_ID;				      // nearest tower id
+				if (tower_ID != -1)
+				{
+					population_with_tower_id[magic_x * (MAP_SIZE / DISTRICT_SIZE) + magic_y][0] = magicMap[magic_x][magic_y]; // population in district
+					population_with_tower_id[magic_x * (MAP_SIZE / DISTRICT_SIZE) + magic_y][1] = tower_ID;				      // nearest tower id
+				}
+				else
+				{
+					population_with_tower_id[magic_x * (MAP_SIZE / DISTRICT_SIZE) + magic_y][0] = 0; // population in district
+					population_with_tower_id[magic_x * (MAP_SIZE / DISTRICT_SIZE) + magic_y][1] = tower_ID;				      // nearest tower id
+				}
 			}
 		}
 
@@ -423,7 +433,7 @@ public:
 		for (int i = 0; i < playerTowers.actualPosition; i++)
 		{
 			tempOffer = PalyerCalculateMinimumOffer(playerTowers.playerTowerIndexes[i][0]);
-			
+
 			if ((playerTowers.playerTowerIndexes[i][3] - inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust) > CUSTOMER_CHANGES)
 			{
 					
@@ -458,13 +468,7 @@ public:
 				changeDistanceAndOffer(	playerTowers.playerTowerIndexes[i][0],
 										inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
 										inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.9);
-			}
-			else if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust == 0)
-			{
-				changeDistanceAndOffer(	playerTowers.playerTowerIndexes[i][0],
-										inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
-										1);
-			}			
+			}		
 		}
 	}
 

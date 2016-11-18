@@ -106,13 +106,14 @@ void TPlayer::makeMove() {
 	int i = 0;
 	double currentRentingCost = 0;
 	double distance = 0;
+	int maxTowerBuyInInitState = 0;
 
 	state = determinateCurrentState(inputData, playerMoneyBuffer);	//ezt a kettot nem kéne felcserelni?
 	playerMoneyBuffer.Add(inputData.header.money);					//???
 	switch (state)
 	{
 		case initState:
-			while ((money > (inputData.header.money*0.95)) && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)))
+			while ((money > (inputData.header.money*0.95)) && (i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)) && (maxTowerBuyInInitState< MAX_TOWER_BUY_IN_INIT_STATE))
 			{			
 				if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0) && magicMap.population_with_tower_id[i][0]>DEFAULT_POPULATION)
 				{
@@ -123,6 +124,7 @@ void TPlayer::makeMove() {
 												DEFAULT_RENTING_COST,
 												magicMap.population_with_tower_id[i][0])
 							 );
+					maxTowerBuyInInitState++;
 					money -= DEFAULT_RENTING_COST;
 				}
 				i++;				
@@ -174,6 +176,15 @@ void TPlayer::makeMove() {
 		default:
 			break;
 	}
+
+	/*for (int k = 0; k < playerTowers.actualPositionOfBlackList; k++)
+	{
+		if (playerTowers.playerBlackListTower[k][0] > -1)
+		{
+			leaveTower(playerTowers.playerBlackListTower[k][0]);
+			playerTowers.playerBlackListTower[k][1] = -1;
+		}
+	}*/
 
 		HandleCostumerChange();
 		HandleTowerDistance();
