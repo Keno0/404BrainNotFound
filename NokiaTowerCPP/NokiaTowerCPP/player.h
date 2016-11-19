@@ -13,8 +13,8 @@
 #define PLAYER_TOWER_INDEXES 100
 #define DISTRICT_SIZE 25  //Best around 20-25
 #define CUSTOMER_CHANGES 10000
-#define PLAN_PROFIT 1.2 // used for calculate the offer when try to rent a tower, 0.2 = 20% profit
-#define PROFIT_PER_CUSTOMER 0.00001
+#define PLAN_PROFIT 1.4 // used for calculate the offer when try to rent a tower, 0.2 = 20% profit
+#define PROFIT_PER_CUSTOMER 0.000001
 #define PREDICT_OF_CUSTUMER_OF_A_TOWER 0.2 //20%-a district population-nek
 #define DEFAULT_RENTING_COST 7
 #define DEFAULT_POPULATION 150000 // ez alatti district population-nél nem veszünk tornyot
@@ -23,15 +23,16 @@
 #define MIN_CUSTOMER_AT_A_TOWER 20000
 #define AVERAGE_POPULATION_GROWTH 1.00015
 #define MAX_TOWER_BUY 3
-#define MAX_TOWER_BUY_IN_INIT_STATE 5
+#define MAX_TOWER_BUY_IN_INIT_STATE 3
 using namespace std;
 
 class PlayerTowers
 {
 public:
-	int playerTowerIndexes[PLAYER_TOWER_INDEXES][5]; //[i][0]: tower index, [i][1]: max costumer, [i][2]:maxprofit, [i][3]: current customer, [i][4]: current profit
-	int actualPosition=0, actualPositionOfBlackList=0;
+	int playerTowerIndexes[PLAYER_TOWER_INDEXES][6]; //[i][0]: tower index, [i][1]: max costumer, [i][2]:maxprofit, [i][3]: current customer, [i][4]: current profit [i][5]: all earned profit
+	int actualPosition=0, actualPositionOfBlackList=0, actualPositionOfLeavedTowers=0;
 	int playerBlackListTower[PLAYER_TOWER_INDEXES][2]; //index, leaved
+	int playerLeavedTower[PLAYER_TOWER_INDEXES][2]; //index, counter for rerent
 
 	PlayerTowers()
 	{
@@ -39,7 +40,7 @@ public:
 		{
 			playerBlackListTower[i][0] = -1;
 			playerBlackListTower[i][1] = -1;
-			for (int j = 0; j < 5; j++)
+			for (int j = 0; j < 6; j++)
 			{
 				playerTowerIndexes[i][j] = -1;
 			}
@@ -49,25 +50,61 @@ public:
 
 	void AddTowerToBlacklist(int towerID)
 	{
-		if (actualPositionOfBlackList < PLAYER_TOWER_INDEXES)
+		if (actualPositionOfBlackList < PLAYER_TOWER_INDEXES && !IsItTowerInBlackList(towerID))
 		{
 			playerBlackListTower[actualPositionOfBlackList][0] = towerID;
 			playerBlackListTower[actualPositionOfBlackList][1] = 1;
 			actualPositionOfBlackList++;
 		}
-		else
+		else if (actualPositionOfBlackList == PLAYER_TOWER_INDEXES)
 			actualPositionOfBlackList = 0;
 	}
 
 	void Add(int towerID)
 	{
-		if (actualPosition < PLAYER_TOWER_INDEXES)
+		if (actualPosition < PLAYER_TOWER_INDEXES && !IsItOurTower(towerID))
 		{
 			playerTowerIndexes[actualPosition][0] = towerID;
 			actualPosition++;
 		}
-		else
+		else if(actualPosition == PLAYER_TOWER_INDEXES)
 			actualPosition = 0;
+	}
+
+	void AddToLeavedTowers(int towerID)
+	{
+
+		if (actualPositionOfLeavedTowers < PLAYER_TOWER_INDEXES && !IsItTowerInLeavedTowerList(towerID))
+		{
+			playerLeavedTower[actualPositionOfLeavedTowers][0] = towerID;
+			playerLeavedTower[actualPositionOfLeavedTowers][1] = 10;
+			actualPositionOfLeavedTowers++;
+		}
+		else if (actualPositionOfLeavedTowers == PLAYER_TOWER_INDEXES)
+			actualPositionOfLeavedTowers = 0;
+	}
+
+	void UpdateLeavedTowersCounter()
+	{
+		for (int i = 0; i < actualPositionOfLeavedTowers; i++)
+		{
+			if (playerLeavedTower[i][1] != 0 && playerLeavedTower[i][0] != -1)
+				playerLeavedTower[i][1]--;
+			else if(playerLeavedTower[i][0] != -1)
+			{
+				playerLeavedTower[i][0] = -1;
+				playerLeavedTower[i][1] = -1;
+			}
+		}
+	}
+
+	int CouterOfLeavedTower(int towerID)
+	{
+		for (int i = 0; i < actualPositionOfLeavedTowers; i++)
+		{
+			if (playerLeavedTower[i][0] == towerID)
+				return playerLeavedTower[i][1];
+		}
 	}
 
 	void Remove(int towerID)
@@ -76,9 +113,21 @@ public:
 		{
 			if (playerTowerIndexes[i][0] == towerID)
 			{
-				playerTowerIndexes[i][0] = -1;
-				playerTowerIndexes[i][1] = -1;
-				playerTowerIndexes[i][2] = -1;
+				for(int j=0; j<6; j++)
+					playerTowerIndexes[i][j] = -1;
+
+			}
+		}
+	}
+
+	void RemoveFromLeavedTower(int towerID)
+	{
+		for (int i = 0; i <= actualPositionOfLeavedTowers; i++)
+		{
+			if (playerLeavedTower[i][0] == towerID)
+			{
+				playerLeavedTower[i][0] = -1;
+			    playerLeavedTower[i][1] = -1;
 
 			}
 		}
@@ -106,6 +155,17 @@ public:
 		return false;
 	}
 
+	bool IsItTowerInLeavedTowerList(int towerID)
+	{
+		for (int i = 0; i <= actualPositionOfLeavedTowers; i++)
+		{
+			if (playerLeavedTower[i][0] == towerID)
+				return true;
+		}
+
+		return false;
+	}
+
 	void UpdateTowerData(TinputData inputData)
 	{
 		//[i][0]: tower index, [i][1]: max costumer, [i][2]:maxprofit, [i][3]: current customer, [i][4]: current profit
@@ -118,28 +178,37 @@ public:
 					playerTowerIndexes[i][1] = inputData.towerInf[playerTowerIndexes[i][0]].cust;
 				}
 
+				//Ha nagyobb a változás mint a CUSTOMER CHANGES, akkor updateljük a playerTower customert
 				if (inputData.towerInf[playerTowerIndexes[i][0]].cust + CUSTOMER_CHANGES > playerTowerIndexes[i][3])
 					playerTowerIndexes[i][3] = inputData.towerInf[playerTowerIndexes[i][0]].cust;
 				else if (inputData.towerInf[playerTowerIndexes[i][0]].cust - CUSTOMER_CHANGES < playerTowerIndexes[i][3])
 					playerTowerIndexes[i][3] = inputData.towerInf[playerTowerIndexes[i][0]].cust;
 
+				playerTowerIndexes[i][4] = TowerProfit(inputData.towerInf[playerTowerIndexes[i][0]]);
+				if(playerTowerIndexes[i][5] <= 200)
+					playerTowerIndexes[i][5] += TowerProfit(inputData.towerInf[playerTowerIndexes[i][0]]);
+				else if(TowerProfit(inputData.towerInf[playerTowerIndexes[i][0]]) <= 0)
+					playerTowerIndexes[i][5] += TowerProfit(inputData.towerInf[playerTowerIndexes[i][0]]);
 				if (TowerProfit(inputData.towerInf[playerTowerIndexes[i][0]]) > playerTowerIndexes[i][2])
 					playerTowerIndexes[i][2] = TowerProfit(inputData.towerInf[playerTowerIndexes[i][0]]);
-				else if (TowerProfit(inputData.towerInf[playerTowerIndexes[i][0]]) <= 0)
+				
+				if (playerTowerIndexes[i][5] <= -100)
 				{
 
 					AddTowerToBlacklist(playerTowerIndexes[i][0]);
 					Remove(playerTowerIndexes[i][0]);
 				}
 
-				playerTowerIndexes[i][4] = TowerProfit(inputData.towerInf[playerTowerIndexes[i][0]]);
+				
 			}
 		}
+
+		UpdateLeavedTowersCounter();
 	}
 
 	int TowerProfit(TtowerInfRec towerInfo)
 	{
-		return towerInfo.cust * towerInfo.offer*0.000001 - (towerInfo.rentingCost + towerInfo.runningCost);
+		return towerInfo.cust * towerInfo.offer*PROFIT_PER_CUSTOMER - (towerInfo.rentingCost + towerInfo.runningCost);
 	}
 	
 };
@@ -273,6 +342,7 @@ public:
 			}
 
 		}
+		cout << "end of giveMeMyMagicMap" << endl;
 	}
 
 	void MagicMap::giveMeMyTowerPopulation() {
@@ -288,7 +358,7 @@ public:
 			{
 				bigmap_district_center_x = (DISTRICT_SIZE / 2) + (DISTRICT_SIZE * magic_x);
 				bigmap_district_center_y = (DISTRICT_SIZE / 2) + (DISTRICT_SIZE * magic_y);
-				double min_distance = 1000;
+				double min_distance = getDistance(DISTRICT_SIZE, DISTRICT_SIZE, DISTRICT_SIZE/2, DISTRICT_SIZE / 2);
 
 				int tower_ID = -1;
 				/* get nearest tower to district center */
@@ -421,7 +491,7 @@ public:
 	{
 		for (int i = 0; i < TOWER_MAX; i++)
 		{
-			if (inputData.towerInf[i].owner == ID && inputData.towerInf[i].licit == 0)
+			if (inputData.towerInf[i].owner == ID && inputData.towerInf[i].licit == 0 && !playerTowers.IsItTowerInLeavedTowerList(i))
 				if (!playerTowers.IsItOurTower(i))
 					playerTowers.Add(i);
 		}
@@ -432,43 +502,46 @@ public:
 		int tempOffer = 1;
 		for (int i = 0; i < playerTowers.actualPosition; i++)
 		{
-			tempOffer = PalyerCalculateMinimumOffer(playerTowers.playerTowerIndexes[i][0]);
+			if (playerTowers.playerTowerIndexes[i][0] != -1)
+			{
+				tempOffer = PalyerCalculateMinimumOffer(playerTowers.playerTowerIndexes[i][0]);
 
-			if ((playerTowers.playerTowerIndexes[i][3] - inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust) > CUSTOMER_CHANGES)
-			{
-					
-				if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.8 < tempOffer)
+				if ((playerTowers.playerTowerIndexes[i][3] - inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust) > CUSTOMER_CHANGES)
 				{
-					changeDistanceAndOffer(	playerTowers.playerTowerIndexes[i][0],
-											inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
-											tempOffer);
-				}
-				else
-				{
-					changeDistanceAndOffer(	playerTowers.playerTowerIndexes[i][0],
-											inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
-											inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.9);
-				}
-			}
 
-			else if ((inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust - playerTowers.playerTowerIndexes[i][3]) > CUSTOMER_CHANGES)
-			{
-				changeDistanceAndOffer(	playerTowers.playerTowerIndexes[i][0],
-										inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
-										inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*1.1);
+					if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.8 < tempOffer)
+					{
+						changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0],
+							inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
+							tempOffer);
+					}
+					else
+					{
+						changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0],
+							inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
+							inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.9);
+					}
+				}
+
+				else if ((inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust - playerTowers.playerTowerIndexes[i][3]) > CUSTOMER_CHANGES)
+				{
+					changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0],
+						inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
+						inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*1.1);
+				}
+				else if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust > MAX_CUSTOMER_AT_A_TOWER)
+				{
+					changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0],
+						inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
+						inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*1.1);
+				}
+				else if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust < MIN_CUSTOMER_AT_A_TOWER && inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust > 0)
+				{
+					changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0],
+						inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
+						inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.9);
+				}
 			}
-			else if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust > MAX_CUSTOMER_AT_A_TOWER)
-			{
-				changeDistanceAndOffer(	playerTowers.playerTowerIndexes[i][0],
-										inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
-										inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*1.1);
-			}
-			else if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust < MIN_CUSTOMER_AT_A_TOWER && inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust > 0)
-			{
-				changeDistanceAndOffer(	playerTowers.playerTowerIndexes[i][0],
-										inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
-										inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.9);
-			}		
 		}
 	}
 
@@ -509,7 +582,11 @@ public:
 		{
 			distance = getDistanceForRent(magicMap.population_with_tower_id[i][0]);
 			// rent free towers
-			if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0) && magicMap.population_with_tower_id[i][0]>DEFAULT_POPULATION && inputData.header.time % 5 == 0 && maxTowerBuy <= MAX_TOWER_BUY)
+			if ((inputData.towerInf[magicMap.population_with_tower_id[i][1]].owner == 0) && 
+				magicMap.population_with_tower_id[i][0]>DEFAULT_POPULATION && 
+				inputData.header.time % 5 == 0 && 
+				maxTowerBuy <= MAX_TOWER_BUY && 
+				!playerTowers.IsItTowerInLeavedTowerList(magicMap.population_with_tower_id[i][1]))
 			{
 				rentTower(magicMap.population_with_tower_id[i][1], DEFAULT_RENTING_COST, distance,
 					CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], DEFAULT_RENTING_COST, magicMap.population_with_tower_id[i][0]));
@@ -582,6 +659,20 @@ public:
 		return ((1 + PLAN_PROFIT)*(distance*distance*0.04 + rentingCost) / (disctrictCustomer*PROFIT_PER_CUSTOMER*PREDICT_OF_CUSTUMER_OF_A_TOWER));
 	}
 
+	void LeaveTowersFromBlackList()
+	{
+		for (int i = 0; i < playerTowers.actualPositionOfBlackList; i++)
+		{
+			if (playerTowers.playerBlackListTower[i][0] != -1)
+			{
+				leaveTower(playerTowers.playerBlackListTower[i][0]);
+				playerTowers.AddToLeavedTowers(playerTowers.playerBlackListTower[i][0]);
+				playerTowers.playerBlackListTower[i][0] = -1; // Remove
+				
+			}
+		}
+	}
+
 protected:
     void rentTower(short ID, float rentingCost, short dist, float offer)
     {
@@ -596,6 +687,7 @@ protected:
         }
     }
 
+
     void leaveTower(short ID)
     {
         if (outputData.numOrders < ORDER_MAX)
@@ -607,6 +699,7 @@ protected:
             outputData.orders[outputData.numOrders].offer = 0;
             outputData.numOrders++;
         }
+
     }
 
     void changeDistanceAndOffer(short ID, short dist, float offer)

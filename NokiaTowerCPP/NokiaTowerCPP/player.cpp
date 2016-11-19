@@ -89,10 +89,12 @@ void TPlayer::makeMove() {
 	int maxPopLocationX = 0;
 	int maxPopLocationY = 0;
 	States state = initState;
+	int leave = 0;
 
     map->MapNextTime(); // next population state
 
     cout << "time: " << inputData.header.time << " total population:" << map->totalPop << endl;
+	cout << "Tower 93 Cust: " << inputData.towerInf[93].cust << endl;
 
     myTime++;
     outputData.invest = 0;
@@ -134,10 +136,12 @@ void TPlayer::makeMove() {
 		case growth:
 
 			GrowthStateLevel1();
+			
+
 			break;
 
 		case stagnation:
-			while (	money > inputData.header.money*0.95 &&
+			/*while (	money > inputData.header.money*0.95 &&
 					(i < (MAP_SIZE / DISTRICT_SIZE)*(MAP_SIZE / DISTRICT_SIZE)) &&
 					inputData.header.money > SAFETY_MONEY)
 			{
@@ -169,7 +173,7 @@ void TPlayer::makeMove() {
 				i++;
 			}
 			if (inputData.towerInf[playerTowers.playerTowerIndexes[playerTowers.actualPosition][0]].techLevel < 5)
-				outputData.invest = playerMoneyBuffer.AvarageOfLastFiveMonth()*0.05;
+				outputData.invest = playerMoneyBuffer.AvarageOfLastFiveMonth()*0.05;*/
 			break;
 		case decrease:
 			break;
@@ -177,18 +181,11 @@ void TPlayer::makeMove() {
 			break;
 	}
 
-	/*for (int k = 0; k < playerTowers.actualPositionOfBlackList; k++)
-	{
-		if (playerTowers.playerBlackListTower[k][0] > -1)
-		{
-			leaveTower(playerTowers.playerBlackListTower[k][0]);
-			playerTowers.playerBlackListTower[k][1] = -1;
-		}
-	}*/
-
+	playerTowers.UpdateTowerData(inputData);
+	LeaveTowersFromBlackList();
 		HandleCostumerChange();
 		HandleTowerDistance();
-		playerTowers.UpdateTowerData(inputData);    
+		  
 }
 
 
