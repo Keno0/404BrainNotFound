@@ -13,17 +13,17 @@
 #define PLAYER_TOWER_INDEXES 100
 #define DISTRICT_SIZE 25  //Best around 20-25
 #define CUSTOMER_CHANGES 10000
-#define PLAN_PROFIT 1.4 // used for calculate the offer when try to rent a tower, 0.2 = 20% profit
+#define PLAN_PROFIT 0.2 // used for calculate the offer when try to rent a tower, 0.2 = 20% profit
 #define PROFIT_PER_CUSTOMER 0.000001
 #define PREDICT_OF_CUSTUMER_OF_A_TOWER 0.2 //20%-a district population-nek
 #define DEFAULT_RENTING_COST 7
 #define DEFAULT_POPULATION 150000 // ez alatti district population-nél nem veszünk tornyot
-#define SAFETY_MONEY 5000
+#define SAFETY_MONEY 2000
 #define MAX_CUSTOMER_AT_A_TOWER 500000
 #define MIN_CUSTOMER_AT_A_TOWER 20000
 #define AVERAGE_POPULATION_GROWTH 1.00015
 #define MAX_TOWER_BUY 3
-#define MAX_TOWER_BUY_IN_INIT_STATE 3
+#define MAX_TOWER_BUY_IN_INIT_STATE 10
 using namespace std;
 
 class PlayerTowers
@@ -504,12 +504,12 @@ public:
 		{
 			if (playerTowers.playerTowerIndexes[i][0] != -1)
 			{
-				tempOffer = PalyerCalculateMinimumOffer(playerTowers.playerTowerIndexes[i][0]);
-
+				//tempOffer = PalyerCalculateMinimumOffer(playerTowers.playerTowerIndexes[i][0]);
+				tempOffer = 1;
 				if ((playerTowers.playerTowerIndexes[i][3] - inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].cust) > CUSTOMER_CHANGES)
 				{
 
-					if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.8 < tempOffer)
+					if (inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer < tempOffer)
 					{
 						changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0],
 							inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
@@ -519,7 +519,7 @@ public:
 					{
 						changeDistanceAndOffer(playerTowers.playerTowerIndexes[i][0],
 							inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].distance,
-							inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.9);
+							inputData.towerInf[playerTowers.playerTowerIndexes[i][0]].offer*0.5);
 					}
 				}
 
@@ -588,8 +588,7 @@ public:
 				maxTowerBuy <= MAX_TOWER_BUY && 
 				!playerTowers.IsItTowerInLeavedTowerList(magicMap.population_with_tower_id[i][1]))
 			{
-				rentTower(magicMap.population_with_tower_id[i][1], DEFAULT_RENTING_COST, distance,
-					CalculateOffer(10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0], DEFAULT_RENTING_COST, magicMap.population_with_tower_id[i][0]));
+				rentTower(magicMap.population_with_tower_id[i][1], DEFAULT_RENTING_COST, distance, 30);
 				money -= DEFAULT_RENTING_COST;
 				cout << "tower pop: " << magicMap.population_with_tower_id[i][0] << endl;
 				maxTowerBuy++;

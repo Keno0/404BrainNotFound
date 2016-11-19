@@ -122,9 +122,7 @@ void TPlayer::makeMove() {
 					rentTower(	magicMap.population_with_tower_id[i][1],
 								DEFAULT_RENTING_COST,
 								10 + DISTRICT_SIZE*0.0000015* magicMap.population_with_tower_id[i][0],
-								CalculateOffer(	10 + DISTRICT_SIZE*0.00000015* magicMap.population_with_tower_id[i][0],
-												DEFAULT_RENTING_COST,
-												magicMap.population_with_tower_id[i][0])
+								30
 							 );
 					maxTowerBuyInInitState++;
 					money -= DEFAULT_RENTING_COST;
